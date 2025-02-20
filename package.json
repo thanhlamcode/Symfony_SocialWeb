@@ -1,0 +1,29 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "encore dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/thanhlamcode/Symfony-Project-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thanhlamcode/Symfony-Project-1/issues"
+  },
+  "homepage": "https://github.com/thanhlamcode/Symfony-Project-1#readme",
+  "description": "",
+  "devDependencies": {
+    "@symfony/webpack-encore": "^5.0.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.3",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^4.0.7",
+    "webpack-notifier": "^1.15.0"
+  }
+}

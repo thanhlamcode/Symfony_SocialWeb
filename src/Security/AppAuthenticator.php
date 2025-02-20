@@ -22,6 +22,8 @@ class AppAuthenticator extends AbstractAuthenticator
         $this->router = $router;
     }
 
+    // Xác định khi nào Authenticator được sử dụng
+    // Kiểm tra xem request có thuộc route 'app_login' và sử dụng phương thức POST hay không.
     public function supports(Request $request): ?bool
     {
         return $request->attributes->get('_route') === 'app_login' && $request->isMethod('POST');
