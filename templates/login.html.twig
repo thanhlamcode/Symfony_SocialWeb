@@ -3,17 +3,51 @@
 {% block title %}Đăng nhập{% endblock %}
 
 {% block body %}
-    <h1 class="">Đăng nhập</h1>
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-    <form method="post">
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required autofocus>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-purple-500">
+        <div class="bg-white p-10 rounded-2xl shadow-lg max-w-md w-full">
+            <h1 class="text-2xl font-bold text-center text-gray-700">Đăng nhập</h1>
 
-        <label for="password">Mật khẩu:</label>
-        <input type="password" name="password" id="password" required>
+            {% if error %}
+                <div class="mt-3 text-red-500 text-sm text-center">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
 
-        <button type="submit">Đăng nhập</button>
-    </form>
+            <form method="post" class="mt-6">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" required autofocus
+                           class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                    <input type="password" name="password" id="password" required
+                           class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <a href="#" class="text-sm text-blue-500 hover:underline">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="mt-4 w-full bg-gradient-to-r from-blue-400 to-purple-500 text-white py-2 rounded-lg hover:opacity-90 transition">
+                    Đăng nhập
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-gray-600 text-sm">
+                Hoặc đăng nhập bằng:
+            </div>
+
+            <div class="mt-3 flex justify-center space-x-4">
+                <a href="#" class="p-2 bg-blue-600 rounded-full text-white hover:opacity-80 transition"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="p-2 bg-blue-400 rounded-full text-white hover:opacity-80 transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="p-2 bg-red-500 rounded-full text-white hover:opacity-80 transition"><i class="fab fa-google"></i></a>
+            </div>
+
+            <div class="mt-6 text-center text-gray-600 text-sm">
+                Chưa có tài khoản? <a href="/register" class="text-blue-500 hover:underline">Đăng ký</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
