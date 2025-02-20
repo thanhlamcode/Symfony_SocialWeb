@@ -33,18 +33,31 @@ class SecurityController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Mã hóa mật khẩu
-            $hashedPassword = $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData());
-            $user->setPassword($hashedPassword);
-            $user->setRoles(['ROLE_USER']);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // Kiểm tra email đã tồn tại chưa
+                $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+                if ($existingUser) {
+                    $this->addFlash('error', 'Email đã tồn tại. Vui lòng chọn email khác.');
+                    return $this->redirectToRoute('app_register');
+                }
 
-            // Lưu vào database
-            $entityManager->persist($user);
-            $entityManager->flush();
+                // Mã hóa mật khẩu
+                $hashedPassword = $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData());
+                $user->setPassword($hashedPassword);
+                $user->setRoles(['ROLE_USER']);
 
-            $this->addFlash('success', 'Đăng ký thành công! Hãy đăng nhập.');
-            return $this->redirectToRoute('app_login');
+                // Lưu vào database
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                // Thông báo thành công
+                $this->addFlash('success', 'Đăng ký thành công! Hãy đăng nhập.');
+                return $this->redirectToRoute('app_login');
+            } else {
+                // Nếu form không hợp lệ, hiển thị thông báo lỗi
+                $this->addFlash('error', 'Có lỗi trong quá trình đăng ký. Vui lòng kiểm tra lại.');
+            }
         }
 
         return $this->render('register.html.twig', [

@@ -19,8 +19,8 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Assert\NotBlank(),
-                    new Assert\Email(),
+                    new Assert\NotBlank(['message' => 'Email không được để trống']),
+                    new Assert\Email(['message' => 'Email không hợp lệ']),
                 ],
             ])
             ->add('plainPassword', RepeatedType::class, [
@@ -29,12 +29,12 @@ class RegistrationFormType extends AbstractType
                 'first_options' => ['label' => 'Mật khẩu'],
                 'second_options' => ['label' => 'Xác nhận mật khẩu'],
                 'constraints' => [
-                    new Assert\NotBlank(),
-                    new Assert\Length(['min' => 6, 'minMessage' => 'Mật khẩu phải có ít nhất 6 ký tự.']),
+                    new Assert\NotBlank(['message' => 'Mật khẩu không được để trống']),
+                    new Assert\Length([
+                        'min' => 6,
+                        'minMessage' => 'Mật khẩu phải có ít nhất 6 ký tự',
+                    ]),
                 ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Đăng ký',
             ]);
     }
 
@@ -45,3 +45,4 @@ class RegistrationFormType extends AbstractType
         ]);
     }
 }
+
