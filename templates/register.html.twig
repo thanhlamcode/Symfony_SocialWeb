@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Đăng ký{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-purple-500">
+        <div class="bg-white p-10 rounded-2xl shadow-lg max-w-md w-full">
+            <h1 class="text-2xl font-bold text-center text-gray-700">Đăng ký</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="text-green-500 text-center mb-4">{{ message }}</div>
+            {% endfor %}
+
+            {% if registrationForm is defined %}
+                {{ form_start(registrationForm, {'attr': {'class': 'mt-6'}}) }}
+
+                <div class="mb-4">
+                    {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'}}) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(registrationForm.plainPassword.first, 'Mật khẩu', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'}}) }}
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(registrationForm.plainPassword.second, 'Xác nhận mật khẩu', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'}}) }}
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+
+                <button type="submit" class="mt-4 w-full bg-gradient-to-r from-blue-400 to-purple-500 text-white py-2 rounded-lg hover:opacity-90 transition">
+                    Đăng ký
+                </button>
+            {% endif %}
+
+            <div class="mt-6 text-center text-gray-600 text-sm">
+                Đã có tài khoản? <a href="{{ path('app_login') }}" class="text-blue-500 hover:underline">Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
