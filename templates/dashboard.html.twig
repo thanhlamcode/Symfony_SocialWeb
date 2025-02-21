@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Office Chat{% endblock %}
+{% block title %}Chat{% endblock %}
 
 {% block body %}
     <div class="flex h-screen w-full">
@@ -10,13 +10,13 @@
             <div class="text-2xl font-bold tracking-widest mb-6">CH</div>
             <div class="flex flex-col space-y-4">
                 <div class="relative flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
-                    <img src="/icons/chat.svg" class="w-8 h-8">
+                    <img src={{ asset('icons/allchat.png')}} class="w-8 h-8">
                     <span class="absolute -top-1 -right-3 bg-gray-700 text-xs px-2 py-0.5 rounded-full">86</span>
                     <p class="text-xs mt-1">All chats</p>
                 </div>
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
-                    <img src="/icons/folder.svg" class="w-8 h-8">
-                    <p class="text-xs mt-1">Work</p>
+                    <img src={{ asset('icons/profile.png')}} class="w-8 h-8">
+                    <p class="text-xs mt-1">Profile</p>
                 </div>
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/folder.svg" class="w-8 h-8">
