@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="flex h-screen w-full bg-gray-900 text-white">
+        {% include 'components/sidebar.html.twig' %}
+
+        {# Sidebar Danh sách lời mời kết bạn #}
+        <div class="w-[30%] bg-gray-900 p-6 overflow-y-auto">
+            <div class="max-w-lg mx-auto">
+                {# Tiêu đề #}
+                <h2 class="text-2xl font-bold mb-6">Lời mời kết bạn</h2>
+
+                {# Danh sách lời mời #}
+                <div class="flex flex-col space-y-4">
+                    {% for user in users %}
+                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col items-center p-4">
+                            {# Ảnh đại diện #}
+                            <img src="{{ user.avatar }}" alt="{{ user.name }}" class="w-28 h-28 object-cover rounded-full border-4 border-gray-700 shadow-md">
+
+                            {# Thông tin người dùng #}
+                            <p class="mt-3 text-lg font-semibold">{{ user.name }}</p>
+
+                            {# Hiển thị bạn chung nếu có #}
+                            {% if user.mutual_friends %}
+                                <div class="flex items-center mt-2 text-gray-400 text-sm">
+                                    <img src="{{ user.mutual_avatar }}" class="w-6 h-6 rounded-full border border-gray-500">
+                                    <span class="ml-2">{{ user.mutual_friends }} bạn chung</span>
+                                </div>
+                            {% endif %}
+
+                            {# Nút hành động #}
+                            <div class="mt-4 flex flex-col gap-2 w-full">
+                                <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                                    Kết bạn
+                                </button>
+                                <button class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">
+                                    Xem hồ sơ
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {# Nội dung chính - Danh sách người dùng #}
+        <div class="w-[70%] bg-gray-900 p-6 overflow-y-auto">
+            <div class="max-w-6xl mx-auto">
+                {# Tiêu đề + Link xem tất cả #}
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Danh sách người dùng</h2>
+                    <a href="#" class="text-blue-400 hover:underline">Xem tất cả</a>
+                </div>
+
+                {# Danh sách người dùng #}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {% for friend in friend_requests %}
+                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg">
+                            {# Ảnh đại diện #}
+                            <img src="{{ friend.avatar }}" alt="{{ friend.name }}" class="w-full h-48 object-cover">
+
+                            {# Thông tin bạn bè #}
+                            <div class="p-4">
+                                <p class="text-lg font-semibold">{{ friend.name }}</p>
+
+                                {# Hiển thị bạn chung nếu có #}
+                                {% if friend.mutual_friends %}
+                                    <div class="flex items-center mt-2 text-gray-400 text-sm">
+                                        <img src="{{ friend.mutual_avatar }}" class="w-6 h-6 rounded-full border border-gray-500">
+                                        <span class="ml-2">{{ friend.mutual_friends }} bạn chung</span>
+                                    </div>
+                                {% endif %}
+
+                                {# Nút hành động #}
+                                <div class="mt-4 flex flex-col gap-2">
+                                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                                        Xác nhận
+                                    </button>
+                                    <button class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
