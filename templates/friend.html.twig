@@ -55,12 +55,15 @@
                 {# Danh sách người dùng #}
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {% for friend in friend_requests %}
-                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg">
+                        <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg h-full flex flex-col justify-between min-h-[350px]">
+
                             {# Ảnh đại diện #}
-                            <img src="{{ friend.avatar }}" alt="{{ friend.name }}" class="w-full h-48 object-cover">
+                            <div class="w-full h-48 bg-gray-700 flex items-center justify-center">
+                                <img src="{{ friend.avatar }}" alt="{{ friend.name }}" class="w-full h-full object-cover">
+                            </div>
 
                             {# Thông tin bạn bè #}
-                            <div class="p-4">
+                            <div class="p-4 flex flex-col flex-grow">
                                 <p class="text-lg font-semibold">{{ friend.name }}</p>
 
                                 {# Hiển thị bạn chung nếu có #}
@@ -70,20 +73,22 @@
                                         <span class="ml-2">{{ friend.mutual_friends }} bạn chung</span>
                                     </div>
                                 {% endif %}
-
-                                {# Nút hành động #}
-                                <div class="mt-4 flex flex-col gap-2">
-                                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                                        Xác nhận
-                                    </button>
-                                    <button class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">
-                                        Xóa
-                                    </button>
-                                </div>
                             </div>
+
+                            {# Nút hành động #}
+                            <div class="p-4 flex flex-col gap-2">
+                                <button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                                    Xác nhận
+                                </button>
+                                <button class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">
+                                    Xóa
+                                </button>
+                            </div>
+
                         </div>
                     {% endfor %}
                 </div>
+
             </div>
         </div>
     </div>
