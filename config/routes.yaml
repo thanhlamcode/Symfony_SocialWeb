@@ -3,3 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+dashboard:
+    path: /dashboard
+    controller: App\Controller\DashboardController::dashboard
+    methods: [GET]
