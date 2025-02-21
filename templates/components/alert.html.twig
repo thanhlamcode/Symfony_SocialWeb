@@ -1,0 +1,24 @@
+{# templates/components/alert.html.twig #}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for message in app.flashes('success') %}
+        Swal.fire({
+            icon: 'success',
+            title: 'Thành công!',
+            text: '{{ message|e('js') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            text: '{{ message|e('js') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+        {% endfor %}
+    });
+</script>
