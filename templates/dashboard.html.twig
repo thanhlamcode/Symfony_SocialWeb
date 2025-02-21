@@ -5,41 +5,33 @@
 {% block body %}
     <div class="flex h-screen w-full">
 
-        <div class="w-[10%] bg-gray-900 p-4 text-white flex flex-col h-screen items-center">
-            {# Logo hoặc tiêu đề #}
+        {# Sidebar - Ẩn trên mobile, hiện trên md (>=768px) #}
+        <div class="hidden md:flex md:w-[10%] bg-gray-900 p-4 text-white flex-col h-screen items-center">
             <div class="text-2xl font-bold tracking-widest mb-6">CH</div>
 
-            {# Danh sách menu #}
             <div class="flex flex-col space-y-4">
                 <div class="relative flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/chat.svg" class="w-8 h-8">
                     <span class="absolute -top-1 -right-3 bg-gray-700 text-xs px-2 py-0.5 rounded-full">86</span>
                     <p class="text-xs mt-1">All chats</p>
                 </div>
-
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/folder.svg" class="w-8 h-8">
                     <p class="text-xs mt-1">Work</p>
                 </div>
-
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/folder.svg" class="w-8 h-8">
                     <p class="text-xs mt-1">Meet</p>
                 </div>
-
-                {# Dấu phân cách #}
                 <hr class="w-3/4 border-gray-700 my-2">
-
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/calendar.svg" class="w-8 h-8">
                     <p class="text-xs mt-1">Calendar</p>
                 </div>
-
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/rating.svg" class="w-8 h-8">
                     <p class="text-xs mt-1">Rating</p>
                 </div>
-
                 <div class="flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
                     <img src="/icons/saved.svg" class="w-8 h-8">
                     <p class="text-xs mt-1">Saved</p>
@@ -47,14 +39,13 @@
             </div>
         </div>
 
-        <div class="w-[30%] bg-gray-800 p-4 text-white flex flex-col h-screen">
-            {# Ô tìm kiếm #}
+        {# Danh sách cuộc trò chuyện - Ẩn trên mobile, thu nhỏ trên tablet #}
+        <div class="hidden sm:flex sm:w-[30%] lg:w-[30%] bg-gray-800 p-4 text-white flex-col h-screen">
             <div class="relative mb-4">
                 <input type="text" placeholder="Search"
                        class="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400">
             </div>
 
-            {# Danh sách cuộc trò chuyện #}
             <div class="flex-1 overflow-y-auto space-y-3">
                 {% for chat in chat_list %}
                     <div class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 transition">
@@ -68,8 +59,9 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="w-[70%] bg-gray-900 p-6 text-white flex flex-col h-screen">
-            {# Header nhóm chat #}
+
+        {# Khung chat chính - Luôn full màn hình trên mobile #}
+        <div class="w-full sm:w-[70%] bg-gray-900 p-6 text-white flex flex-col h-screen">
             <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between shadow-md">
                 <div>
                     <h2 class="text-xl font-bold">Office chat</h2>
@@ -83,9 +75,7 @@
                 </div>
             </div>
 
-            {# Nội dung chat #}
             <div class="flex-1 overflow-y-auto space-y-6 p-4">
-                {# Tin nhắn hình ảnh #}
                 <div class="flex items-start space-x-3">
                     <img src="/images/avatar1.png" class="w-10 h-10 rounded-full">
                     <div>
@@ -97,50 +87,8 @@
                         </div>
                     </div>
                 </div>
-
-                {# Tin nhắn voice message #}
-                <div class="flex items-start space-x-3">
-                    <img src="/images/avatar2.png" class="w-10 h-10 rounded-full">
-                    <div class="bg-gray-700 p-3 rounded-lg max-w-md">
-                        <p class="text-sm font-bold">Jenny Li</p>
-                        <audio controls class="w-full mt-2">
-                            <source src="/audio/sample.mp3" type="audio/mpeg">
-                        </audio>
-                        <div class="flex space-x-2 text-gray-400 text-xs mt-1">
-                            <span>👀 3</span>
-                            <span>08:57</span>
-                        </div>
-                    </div>
-                </div>
-
-                {# Tin nhắn văn bản #}
-                <div class="flex items-start space-x-3">
-                    <img src="/images/avatar3.png" class="w-10 h-10 rounded-full">
-                    <div class="bg-gray-700 p-3 rounded-lg max-w-md">
-                        <p class="text-sm font-bold">Frank Garcia</p>
-                        <p class="mt-1">We will start celebrating Oleg's birthday soon 🎉</p>
-                        <div class="flex space-x-2 text-gray-400 text-xs mt-1">
-                            <span>👀 3</span>
-                            <span>08:57</span>
-                        </div>
-                    </div>
-                </div>
-
-                {# Tin nhắn của user (nằm bên phải) #}
-                <div class="flex items-start space-x-3 justify-end">
-                    <div class="bg-blue-500 p-3 rounded-lg max-w-md">
-                        <p class="text-sm font-bold">Lili Wilson</p>
-                        <p class="mt-1">I'm stuck in traffic, I'll be there a little later 😓</p>
-                        <div class="flex space-x-2 text-gray-300 text-xs mt-1">
-                            <span>👀 3</span>
-                            <span>09:01</span>
-                        </div>
-                    </div>
-                    <img src="/images/avatar4.png" class="w-10 h-10 rounded-full">
-                </div>
             </div>
 
-            {# Ô nhập tin nhắn #}
             <div class="bg-gray-800 p-4 rounded-lg flex items-center">
                 <button class="text-gray-400 hover:text-white">📎</button>
                 <input type="text" placeholder="Your message"
