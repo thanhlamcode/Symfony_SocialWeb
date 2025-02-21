@@ -1,5 +1,11 @@
 <div class="hidden md:flex md:w-[10%] bg-gray-900 p-4 text-white flex-col h-screen items-center">
-    <div class="text-2xl font-bold tracking-widest mb-6">CH</div>
+    {# Hiển thị avatar và tên người dùng #}
+    <div class="flex flex-col items-center mb-6">
+        <img src="https://cdn-icons-png.flaticon.com/512/8847/8847419.png" class="w-12 h-12 rounded-full border-2 border-gray-500">
+        <p class="mt-2 text-lg font-semibold text-center">Đoàn Thanh Lâm</p>
+    </div>
+
+    {# Điều hướng #}
     <div class="flex flex-col space-y-4">
         <a href="/dashboard" class="relative flex flex-col items-center cursor-pointer hover:text-gray-400 transition">
             <img src={{ asset('icons/allchat.png')}} class="w-8 h-8">
