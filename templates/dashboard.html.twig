@@ -68,6 +68,85 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="w-[70%] bg-gray-200 p-4">Right (70%)</div>
+        <div class="w-[70%] bg-gray-900 p-6 text-white flex flex-col h-screen">
+            {# Header nhóm chat #}
+            <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between shadow-md">
+                <div>
+                    <h2 class="text-xl font-bold">Office chat</h2>
+                    <p class="text-sm text-gray-400">45 members, 24 online</p>
+                </div>
+                <div class="flex space-x-4 text-gray-400">
+                    <button class="hover:text-white">🔍</button>
+                    <button class="hover:text-white">📞</button>
+                    <button class="hover:text-white">📺</button>
+                    <button class="hover:text-white">⚙️</button>
+                </div>
+            </div>
+
+            {# Nội dung chat #}
+            <div class="flex-1 overflow-y-auto space-y-6 p-4">
+                {# Tin nhắn hình ảnh #}
+                <div class="flex items-start space-x-3">
+                    <img src="/images/avatar1.png" class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="text-sm font-bold">Harry Fettel</p>
+                        <img src="/images/pizza.jpg" class="rounded-lg mt-2">
+                        <div class="flex space-x-2 text-gray-400 text-xs mt-1">
+                            <span>👀 3</span>
+                            <span>08:57</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Tin nhắn voice message #}
+                <div class="flex items-start space-x-3">
+                    <img src="/images/avatar2.png" class="w-10 h-10 rounded-full">
+                    <div class="bg-gray-700 p-3 rounded-lg max-w-md">
+                        <p class="text-sm font-bold">Jenny Li</p>
+                        <audio controls class="w-full mt-2">
+                            <source src="/audio/sample.mp3" type="audio/mpeg">
+                        </audio>
+                        <div class="flex space-x-2 text-gray-400 text-xs mt-1">
+                            <span>👀 3</span>
+                            <span>08:57</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Tin nhắn văn bản #}
+                <div class="flex items-start space-x-3">
+                    <img src="/images/avatar3.png" class="w-10 h-10 rounded-full">
+                    <div class="bg-gray-700 p-3 rounded-lg max-w-md">
+                        <p class="text-sm font-bold">Frank Garcia</p>
+                        <p class="mt-1">We will start celebrating Oleg's birthday soon 🎉</p>
+                        <div class="flex space-x-2 text-gray-400 text-xs mt-1">
+                            <span>👀 3</span>
+                            <span>08:57</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Tin nhắn của user (nằm bên phải) #}
+                <div class="flex items-start space-x-3 justify-end">
+                    <div class="bg-blue-500 p-3 rounded-lg max-w-md">
+                        <p class="text-sm font-bold">Lili Wilson</p>
+                        <p class="mt-1">I'm stuck in traffic, I'll be there a little later 😓</p>
+                        <div class="flex space-x-2 text-gray-300 text-xs mt-1">
+                            <span>👀 3</span>
+                            <span>09:01</span>
+                        </div>
+                    </div>
+                    <img src="/images/avatar4.png" class="w-10 h-10 rounded-full">
+                </div>
+            </div>
+
+            {# Ô nhập tin nhắn #}
+            <div class="bg-gray-800 p-4 rounded-lg flex items-center">
+                <button class="text-gray-400 hover:text-white">📎</button>
+                <input type="text" placeholder="Your message"
+                       class="w-full p-2 bg-gray-700 rounded-lg border border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 mx-4">
+                <button class="text-gray-400 hover:text-white">🎤</button>
+            </div>
+        </div>
     </div>
 {% endblock %}
