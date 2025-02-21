@@ -42,7 +42,7 @@ class AppAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        return new RedirectResponse($this->router->generate('app_homepage')); // Chuyển hướng sau khi đăng nhập
+        return new RedirectResponse($this->router->generate('dashboard')); // Chuyển hướng sau khi đăng nhập
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

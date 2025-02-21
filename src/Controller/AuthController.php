@@ -8,14 +8,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
-class SecurityController extends AbstractController
+class AuthController extends AbstractController
 {
     private iterable $authServices;
 
@@ -112,44 +110,9 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/connect/google', name: 'connect_google_start')]
-    public function connectGoogle(ClientRegistry $clientRegistry)
-    {
-        return $clientRegistry->getClient('google')->redirect(['email', 'profile']);
-    }
-
-    #[Route('/google/callback', name: 'google_check')]
-    public function googleCallback(Request $request, ClientRegistry $clientRegistry, EntityManagerInterface $entityManager): Response
-    {
-        $client = $clientRegistry->getClient('google');
-
-        try {
-            $googleUser = $client->fetchUser();
-            $email = $googleUser->getEmail();
-
-            $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-
-            if (!$user) {
-                $user = new User();
-                $user->setEmail($email);
-                $user->setRoles(['ROLE_USER']);
-
-                $entityManager->persist($user);
-                $entityManager->flush();
-            }
-
-            return $this->redirectToRoute('dashboard');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Lỗi đăng nhập với Google: ' . $e->getMessage());
-            return $this->redirectToRoute('app_login');
-        }
-    }
-
-
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
         throw new \Exception('This should never be reached!');
     }
 }
-

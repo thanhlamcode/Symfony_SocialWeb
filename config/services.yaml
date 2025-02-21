@@ -20,7 +20,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Controller\SecurityController:
+    App\Controller\AuthController:
         arguments:
             $authServices:
                 - '@App\Service\Auth\PasswordAuthService'
