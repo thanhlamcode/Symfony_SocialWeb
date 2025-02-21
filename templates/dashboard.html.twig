@@ -68,10 +68,7 @@
                     <p class="text-sm text-gray-400">45 members, 24 online</p>
                 </div>
                 <div class="flex space-x-4 text-gray-400">
-                    <button class="hover:text-white">🔍</button>
-                    <button class="hover:text-white">📞</button>
-                    <button class="hover:text-white">📺</button>
-                    <button class="hover:text-white">⚙️</button>
+                    <img src="{{ asset('icons/call.png') }}" class="w-6 h-6">
                 </div>
             </div>
 
@@ -90,10 +87,10 @@
             </div>
 
             <div class="bg-gray-800 p-4 rounded-lg flex items-center">
-                <button class="text-gray-400 hover:text-white">📎</button>
-                <input type="text" placeholder="Your message"
-                       class="w-full p-2 bg-gray-700 rounded-lg border border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 mx-4">
-                <button class="text-gray-400 hover:text-white">🎤</button>
+                <input type="text" placeholder="Your message" class="w-full p-2 bg-gray-700 rounded-lg border border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 mx-4">
+                <button class="bg-blue-500 p-2 rounded-lg hover:bg-blue-600 transition">
+                    <img src="{{ asset('icons/send.png') }}" class="w-6 h-6">
+                </button>
             </div>
         </div>
     </div>
