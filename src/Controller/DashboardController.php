@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
@@ -15,18 +14,21 @@ class DashboardController extends AbstractController
         // Danh sách chat (dữ liệu giả lập)
         $chatList = [
             [
+                'id' => 1, // Thêm id
                 'name' => 'Nguyễn Văn A',
                 'avatar' => '/images/avatar1.png',
                 'last_message' => 'Bạn khỏe không?',
                 'time' => '10:30 AM'
             ],
             [
+                'id' => 2, // Thêm id
                 'name' => 'Trần Thị B',
                 'avatar' => '/images/avatar2.png',
                 'last_message' => 'Mai gặp nhau nhé!',
                 'time' => '09:15 AM'
             ],
             [
+                'id' => 3, // Thêm id
                 'name' => 'Lê Minh C',
                 'avatar' => '/images/avatar3.png',
                 'last_message' => 'Haha, đúng rồi đó!',
