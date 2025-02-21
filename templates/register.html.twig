@@ -7,14 +7,6 @@
         <div class="bg-white p-10 rounded-2xl shadow-lg max-w-md w-full">
             <h1 class="text-2xl font-bold text-center text-gray-700">Đăng ký</h1>
 
-            {% for message in app.flashes('success') %}
-                <div class="text-green-500 text-center mb-4">{{ message }}</div>
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-                <div class="text-red-500 text-center mb-4">{{ message }}</div>
-            {% endfor %}
-
             {{ form_start(registrationForm, {'attr': {'class': 'mt-6'}}) }}
 
             <div class="mb-4">
@@ -46,4 +38,28 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% for message in app.flashes('success') %}
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ message|e('js') }}',
+                timer: 3000, // Tự động đóng sau 3 giây
+                showConfirmButton: false
+            });
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: '{{ message|e('js') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            {% endfor %}
+        });
+    </script>
 {% endblock %}
