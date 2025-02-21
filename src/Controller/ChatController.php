@@ -11,28 +11,40 @@ class ChatController extends AbstractController
     #[Route('/dashboard/message/{id}', name: 'chat_message')]
     public function message(int $id): Response
     {
-        // Danh sách cuộc trò chuyện
+        // Danh sách cuộc trò chuyện với tin nhắn
         $chatList = [
             [
                 'id' => 1,
                 'name' => 'Nguyễn Văn A',
                 'avatar' => '/images/avatar1.png',
                 'last_message' => 'Bạn khỏe không?',
-                'time' => '10:30 AM'
+                'time' => '10:30 AM',
+                'messages' => [
+                    ['sender' => 'Nguyễn Văn A', 'text' => 'Chào bạn!', 'time' => '10:25 AM'],
+                    ['sender' => 'Bạn', 'text' => 'Chào, bạn khỏe không?', 'time' => '10:27 AM'],
+                ]
             ],
             [
                 'id' => 2,
                 'name' => 'Trần Thị B',
                 'avatar' => '/images/avatar2.png',
                 'last_message' => 'Mai gặp nhau nhé!',
-                'time' => '09:15 AM'
+                'time' => '09:15 AM',
+                'messages' => [
+                    ['sender' => 'Trần Thị B', 'text' => 'Mai có rảnh không?', 'time' => '09:10 AM'],
+                    ['sender' => 'Bạn', 'text' => 'Ừ, mai gặp nhé!', 'time' => '09:12 AM'],
+                ]
             ],
             [
                 'id' => 3,
                 'name' => 'Lê Minh C',
                 'avatar' => '/images/avatar3.png',
                 'last_message' => 'Haha, đúng rồi đó!',
-                'time' => 'Hôm qua'
+                'time' => 'Hôm qua',
+                'messages' => [
+                    ['sender' => 'Bạn', 'text' => 'Hôm qua vui quá!', 'time' => 'Hôm qua'],
+                    ['sender' => 'Lê Minh C', 'text' => 'Haha, đúng rồi đó!', 'time' => 'Hôm qua'],
+                ]
             ]
         ];
 

@@ -4,14 +4,14 @@
     <div class="w-full sm:w-[70%] bg-gray-900 p-6 text-white flex flex-col h-screen">
         <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between shadow-md">
             <div>
-                <h2 class="text-xl font-bold">{{ chat.name }}</h2>
+                <h2 class="text-xl font-bold">{{ current_chat.name }}</h2>
                 <p class="text-sm text-gray-400">Active now</p>
             </div>
         </div>
 
         <div class="flex-1 overflow-y-auto space-y-6 p-4">
-            {% for message in chat.messages %}
-                {% if message.sender == user %}
+            {% for message in current_chat.messages %}
+                {% if message.sender == user.name %}
                     {# Tin nhắn của user (bên phải) #}
                     <div class="flex items-start space-x-3 justify-end">
                         <div class="bg-blue-500 p-3 rounded-lg max-w-md">
@@ -19,7 +19,7 @@
                             <p class="mt-1">{{ message.text }}</p>
                             <div class="flex space-x-2 text-gray-300 text-xs mt-1">
                                 <span>👀 3</span>
-                                <span>{{ message.time|date('H:i') }}</span>
+                                <span>{{ message.time }}</span>
                             </div>
                         </div>
                         <img src="{{ user.avatar }}" class="w-10 h-10 rounded-full">
@@ -27,13 +27,13 @@
                 {% else %}
                     {# Tin nhắn của người khác (bên trái) #}
                     <div class="flex items-start space-x-3">
-                        <img src="{{ message.sender.avatar }}" class="w-10 h-10 rounded-full">
+                        <img src="{{ current_chat.avatar }}" class="w-10 h-10 rounded-full">
                         <div class="bg-gray-700 p-3 rounded-lg max-w-md">
-                            <p class="text-sm font-bold">{{ message.sender.name }}</p>
+                            <p class="text-sm font-bold">{{ message.sender }}</p>
                             <p class="mt-1">{{ message.text }}</p>
                             <div class="flex space-x-2 text-gray-400 text-xs mt-1">
                                 <span>👀 3</span>
-                                <span>{{ message.time|date('H:i') }}</span>
+                                <span>{{ message.time }}</span>
                             </div>
                         </div>
                     </div>
