@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -28,10 +29,6 @@ class AuthController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        // Nếu có lỗi từ trước, hiển thị flash message
-        if ($error) {
-            $this->addFlash('error', $error->getMessageKey());
-        }
 
         // Xác định phương thức đăng nhập hợp lệ
         $validMethods = ['password', 'google', 'facebook'];
@@ -59,15 +56,16 @@ class AuthController extends AbstractController
                     return $this->redirectToRoute('dashboard');
                 } else {
                     $this->addFlash('error', 'Thông tin đăng nhập không hợp lệ.');
+                    return $this->redirectToRoute('app_login');
                 }
             } catch (AuthenticationException $e) {
                 $this->addFlash('error', 'Lỗi xác thực: ' . $e->getMessage());
+                return $this->redirectToRoute('app_login');
             }
         }
 
         return $this->render('login.html.twig', [
             'last_username' => $lastUsername,
-            'error' => $error,
         ]);
     }
 
