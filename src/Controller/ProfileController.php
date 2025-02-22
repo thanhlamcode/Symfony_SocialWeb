@@ -25,7 +25,8 @@ class ProfileController extends AbstractController
                 ['url' => 'https://twitter.com/ShaltOni', 'icon' => 'icons/twitter.svg'],
                 ['url' => 'https://instagram.com/shaltoni', 'icon' => 'icons/instagram.svg'],
                 ['url' => 'https://www.linkedin.com/in/aymanshaltoni/', 'icon' => 'icons/linkedin.svg']
-            ]
+            ],
+            'slug' => 'aymanshaltoni'
         ];
 
         return $this->render('profile.html.twig', [

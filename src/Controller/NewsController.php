@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class StoryController extends AbstractController
+class NewsController extends AbstractController
 {
     #[Route('/dashboard/news', name: 'news')]
     public function storiesAction(): Response
