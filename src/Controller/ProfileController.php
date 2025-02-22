@@ -53,24 +53,25 @@ class ProfileController extends AbstractController
     #[Route('/user/profile/update', name: 'update_profile', methods: ['POST'])]
     public function updateProfile(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
     {
-        //  Lấy dữ liệu từ form
+        // ✅ Lấy dữ liệu từ form
         $data = $request->request->all();
 
-        //  Kiểm tra CSRF Token
+        // ✅ Kiểm tra CSRF Token
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-profile', $data['_csrf_token'] ?? ''))) {
             $this->addFlash('error', 'CSRF token không hợp lệ!');
             return $this->redirectToRoute('profile');
         }
 
-        //  Cập nhật profile qua UserService
-        $profile = $this->userService->updateCurrentUserProfile($data);
+        // ✅ Cập nhật profile
+        $isUpdated = $this->userService->updateCurrentUserProfile($data);
 
-        if (!$profile) {
-            $this->addFlash('error', 'Không tìm thấy Profile hoặc User chưa đăng nhập.');
+        if (!$isUpdated) {
+            $this->addFlash('error', 'Cập nhật hồ sơ thất bại.');
         } else {
             $this->addFlash('success', 'Cập nhật hồ sơ thành công.');
         }
 
         return $this->redirectToRoute('profile');
     }
+
 }

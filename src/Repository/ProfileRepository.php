@@ -30,9 +30,11 @@ class ProfileRepository extends ServiceEntityRepository
      */
     public function save(Profile $profile, bool $flush = true): void
     {
-        $this->_em->persist($profile);
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($profile);
+
         if ($flush) {
-            $this->_em->flush();
+            $entityManager->flush();
         }
     }
 

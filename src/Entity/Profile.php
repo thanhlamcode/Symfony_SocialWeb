@@ -25,9 +25,6 @@ class Profile
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $phone = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $role = null;
-
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $bio = null;
 
@@ -102,17 +99,6 @@ class Profile
     public function setPhone(string $phone): self
     {
         $this->phone = $phone;
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): self
-    {
-        $this->role = $role;
         return $this;
     }
 

@@ -51,7 +51,6 @@ class UserService implements UserServiceInterface
             'name' => $profile?->getName() ?? $user->getEmail(),
             'email' => $user->getEmail(),  // ✅ Thêm email vào đây
             'phone' => $profile?->getPhone() ?? null,
-            'role' => $profile?->getRole() ?? ($user->getRoles()[0] ?? 'ROLE_USER'),
             'avatar' => $profile?->getAvatar() ?? $defaultAvatar,
             'bio' => $profile?->getBio() ?? null,
             'interests' => $profile?->getInterests() ?? [],
@@ -62,21 +61,55 @@ class UserService implements UserServiceInterface
         ];
     }
 
-    public function updateCurrentUserProfile(array $data): ?Profile
+    public function updateCurrentUserProfile(array $data): bool
     {
         $user = $this->getCurrentUser();
 
         if (!$user) {
-            return null;
+            return false; // Không tìm thấy User
         }
 
+        // Tìm Profile theo User ID
         $profile = $this->profileRepository->findByUserId($user->getId());
 
+        // Nếu không tìm thấy Profile, tạo mới
         if (!$profile) {
-            // Nếu không có hồ sơ, có thể tạo mới hoặc báo lỗi
-            return null;
+            $profile = new Profile();
+            $profile->setUserId($user->getId());
         }
 
-        return $this->profileRepository->update($profile, $data);
+        // Cập nhật dữ liệu từ $data
+        if (!empty($data['avatar'])) {
+            $profile->setAvatar($data['avatar']);
+        }
+        if (!empty($data['banner'])) {
+            $profile->setBanner($data['banner']);
+        }
+        if (!empty($data['slug'])) {
+            $profile->setSlug($data['slug']);
+        }
+        if (!empty($data['name'])) {
+            $profile->setName($data['name']);
+        }
+        if (!empty($data['phone'])) {
+            $profile->setPhone($data['phone']);
+        }
+        if (!empty($data['job'])) {
+            $profile->setJob($data['job']); // Sử dụng đúng setter
+        }
+        if (!empty($data['bio'])) {
+            $profile->setBio($data['bio']);
+        }
+        if (!empty($data['interests'])) {
+            $profile->setInterests($data['interests']);
+        }
+        if (!empty($data['socialAccounts'])) {
+            $profile->setSocialAccounts($data['socialAccounts']);
+        }
+
+        // Lưu lại Profile vào database
+        $this->profileRepository->save($profile);
+
+        return true; // Cập nhật hoặc tạo mới thành công
     }
 }
