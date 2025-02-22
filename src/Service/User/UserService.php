@@ -73,6 +73,7 @@ class UserService implements UserServiceInterface
         $profile = $this->profileRepository->findByUserId($user->getId());
 
         if (!$profile) {
+            // Nếu không có hồ sơ, có thể tạo mới hoặc báo lỗi
             return null;
         }
 

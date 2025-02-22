@@ -41,36 +41,34 @@ class ProfileRepository extends ServiceEntityRepository
      */
     public function update(Profile $profile, array $data): Profile
     {
-        // Chỉ cập nhật nếu dữ liệu mới tồn tại
-        if (array_key_exists('avatar', $data)) {
+        if (!empty($data['avatar'])) {
             $profile->setAvatar($data['avatar']);
         }
-        if (array_key_exists('banner', $data)) {
+        if (!empty($data['banner'])) {
             $profile->setBanner($data['banner']);
         }
-        if (array_key_exists('slug', $data)) {
+        if (!empty($data['slug'])) {
             $profile->setSlug($data['slug']);
         }
-        if (array_key_exists('name', $data)) {
+        if (!empty($data['name'])) {
             $profile->setName($data['name']);
         }
-        if (array_key_exists('phone', $data)) {
+        if (!empty($data['phone'])) {
             $profile->setPhone($data['phone']);
         }
-        if (array_key_exists('role', $data)) {
-            $profile->setRole($data['role']);
+        if (!empty($data['job'])) {
+            $profile->setRole($data['job']); // Đúng trường dữ liệu
         }
-        if (array_key_exists('bio', $data)) {
+        if (!empty($data['bio'])) {
             $profile->setBio($data['bio']);
         }
-        if (array_key_exists('interests', $data)) {
+        if (!empty($data['interests'])) {
             $profile->setInterests($data['interests']);
         }
-        if (array_key_exists('socialAccounts', $data)) {
+        if (!empty($data['socialAccounts'])) {
             $profile->setSocialAccounts($data['socialAccounts']);
         }
 
-        // Lưu thay đổi vào database
         $this->_em->flush();
 
         return $profile;

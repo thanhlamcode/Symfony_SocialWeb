@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class ProfileController extends AbstractController
 {
@@ -49,23 +51,26 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/user/profile/update', name: 'update_profile', methods: ['POST'])]
-    public function updateProfile(Request $request): RedirectResponse
+    public function updateProfile(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
     {
-        $data = json_decode($request->getContent(), true);
+        //  Lấy dữ liệu từ form
+        $data = $request->request->all();
 
-        if (!$data) {
-            $this->addFlash('error', 'Dữ liệu không hợp lệ.');
+        //  Kiểm tra CSRF Token
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-profile', $data['_csrf_token'] ?? ''))) {
+            $this->addFlash('error', 'CSRF token không hợp lệ!');
             return $this->redirectToRoute('profile');
         }
 
+        //  Cập nhật profile qua UserService
         $profile = $this->userService->updateCurrentUserProfile($data);
 
         if (!$profile) {
             $this->addFlash('error', 'Không tìm thấy Profile hoặc User chưa đăng nhập.');
-            return $this->redirectToRoute('profile');
+        } else {
+            $this->addFlash('success', 'Cập nhật hồ sơ thành công.');
         }
 
-        $this->addFlash('success', 'Cập nhật hồ sơ thành công.');
         return $this->redirectToRoute('profile');
     }
 }
