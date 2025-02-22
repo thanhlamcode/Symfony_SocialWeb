@@ -2,13 +2,24 @@
 
 namespace App\Controller;
 
+use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 class DashboardController extends AbstractController
 {
+    private UserServiceInterface $userService;
+
+    public function __construct(UserServiceInterface $userService){
+        $this->userService = $userService;
+    }
+
     public function dashboard(): Response
     {
+
+        $profile = $this->userService->getCurrentUserProfile();
+
+
         $user = $this->getUser(); // Lấy thông tin user đang đăng nhập
 
         // Danh sách chat (dữ liệu giả lập)
@@ -55,6 +66,7 @@ class DashboardController extends AbstractController
             'chat_list' => $chatList,
             'current_chat' => $currentChat,
             'messages' => $messages,
+            'profile' => $profile
         ]);
     }
 }

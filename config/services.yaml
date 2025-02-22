@@ -33,5 +33,9 @@ services:
                 clientSecret: '%env(OAUTH_GOOGLE_CLIENT_SECRET)%'
                 redirectUri: '%env(OAUTH_GOOGLE_REDIRECT_URI)%'
 
+    App\Service\User\UserServiceInterface:
+        alias: App\Service\User\UserService
+        public: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
