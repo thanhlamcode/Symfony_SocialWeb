@@ -58,6 +58,24 @@ class UserService implements UserServiceInterface
             'banner' => $profile?->getBanner() ?? null,
             'socialAccounts' => $profile?->getSocialAccounts() ?? [],
             'slug' => $profile?->getSlug() ?? null,
+            'job' => $profile?->getJob() ?? null,
         ];
+    }
+
+    public function updateCurrentUserProfile(array $data): ?Profile
+    {
+        $user = $this->getCurrentUser();
+
+        if (!$user) {
+            return null;
+        }
+
+        $profile = $this->profileRepository->findByUserId($user->getId());
+
+        if (!$profile) {
+            return null;
+        }
+
+        return $this->profileRepository->update($profile, $data);
     }
 }

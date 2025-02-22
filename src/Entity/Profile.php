@@ -43,6 +43,19 @@ class Profile
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     private ?string $slug = null;
 
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private ?string $job = null;
+
+    public function getJob(): ?string
+    {
+        return $this->job;
+    }
+
+    public function setJob(string $job): void
+    {
+        $this->job = $job;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
