@@ -49,6 +49,7 @@ class UserService implements UserServiceInterface
             'id' => $profile?->getId() ?? null,
             'userId' => $user->getId(),
             'name' => $profile?->getName() ?? $user->getEmail(),
+            'email' => $user->getEmail(),  // ✅ Thêm email vào đây
             'phone' => $profile?->getPhone() ?? null,
             'role' => $profile?->getRole() ?? ($user->getRoles()[0] ?? 'ROLE_USER'),
             'avatar' => $profile?->getAvatar() ?? $defaultAvatar,

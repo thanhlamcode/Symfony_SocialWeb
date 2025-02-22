@@ -2,15 +2,25 @@
 
 namespace App\Controller;
 
+use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends AbstractController
 {
+    private UserServiceInterface $userService;
+
+    public function __construct(UserServiceInterface $userService){
+        $this->userService = $userService;
+    }
+
     #[Route('/dashboard/profile', name: 'profile')]
     public function profile(): Response
     {
+
+        $profile = $this->userService->getCurrentUserProfile();
+
         // Dữ liệu user (giả lập)
         $user = [
             'avatar' => '/images/avatar1.png',
@@ -30,7 +40,8 @@ class ProfileController extends AbstractController
         ];
 
         return $this->render('profile.html.twig', [
-            'user' => $user
+            'user' => $user,
+            'profile' => $profile
         ]);
     }
 }
