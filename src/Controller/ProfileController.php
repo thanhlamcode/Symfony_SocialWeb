@@ -33,109 +33,44 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/user/profile/update', name: 'update_profile', methods: ['POST'])]
-    public function updateProfile(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    public function updateProfileField(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
     {
-        // ✅ Lấy dữ liệu từ form
+        // ✅ Lấy dữ liệu từ request
         $data = $request->request->all();
+        $csrfToken = $data['_csrf_token'] ?? '';
 
         // ✅ Kiểm tra CSRF Token
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-profile', $data['_csrf_token'] ?? ''))) {
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-profile', $csrfToken))) {
             $this->addFlash('error', 'CSRF token không hợp lệ!');
             return $this->redirectToRoute('profile');
         }
 
-        // ✅ Cập nhật profile
-        $isUpdated = $this->userService->updateCurrentUserProfile($data);
+        // ✅ Xác định trường cần cập nhật
+        $updateFields = [];
 
-        if (!$isUpdated) {
-            $this->addFlash('error', 'Cập nhật hồ sơ thất bại.');
-        } else {
-            $this->addFlash('success', 'Cập nhật hồ sơ thành công.');
+        if (!empty($data['bio'])) {
+            $updateFields['bio'] = $data['bio'];
         }
 
-        return $this->redirectToRoute('profile');
-    }
-
-    #[Route('/user/profile/update-bio', name: 'update_bio', methods: ['POST'])]
-    public function updateBio(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
-    {
-        // ✅ Lấy dữ liệu từ form
-        $bio = $request->request->get('bio');
-        $csrfToken = $request->request->get('_csrf_token');
-
-        // ✅ Kiểm tra CSRF Token
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-bio', $csrfToken))) {
-            $this->addFlash('error', 'CSRF token không hợp lệ!');
-            return $this->redirectToRoute('profile');
+        if (!empty($data['interests'])) {
+            $updateFields['interests'] = explode(',', $data['interests']);
         }
 
-        // ✅ Chỉ cập nhật trường "bio"
-        $isUpdated = $this->userService->updateCurrentUserProfile(['bio' => $bio]);
+        if (!empty($data['social_accounts'])) {
+            $socialAccountsJson = $data['social_accounts'];
+            $socialAccounts = json_decode($socialAccountsJson, true);
 
-        if (!$isUpdated) {
-            $this->addFlash('error', 'Cập nhật bio thất bại.');
-        } else {
-            $this->addFlash('success', 'Cập nhật bio thành công.');
-        }
+            // ✅ Lọc chỉ các tài khoản hợp lệ
+            $allowedAccounts = [
+                'github' => 'icons/github.png',
+                'linkedin' => 'icons/linkdn.png',
+                'instagram' => 'icons/instagram.png'
+            ];
+            $filteredAccounts = [];
 
-        return $this->redirectToRoute('profile');
-    }
-
-    #[Route('/user/profile/update-interests', name: 'update_interests', methods: ['POST'])]
-    public function updateInterests(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
-    {
-        // ✅ Lấy dữ liệu từ form
-        $csrfToken = $request->request->get('_csrf_token');
-        $interests = explode(',', $request->request->get('interests', ''));
-
-        // ✅ Kiểm tra CSRF Token
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-interests', $csrfToken))) {
-            $this->addFlash('error', 'CSRF token không hợp lệ!');
-            return $this->redirectToRoute('profile');
-        }
-
-        // ✅ Cập nhật sở thích của user
-        $isUpdated = $this->userService->updateCurrentUserProfile(['interests' => $interests]);
-
-        if (!$isUpdated) {
-            $this->addFlash('error', 'Cập nhật sở thích thất bại.');
-        } else {
-            $this->addFlash('success', 'Cập nhật sở thích thành công.');
-        }
-
-        return $this->redirectToRoute('profile');
-    }
-
-    #[Route('/user/profile/update-social-accounts', name: 'update_social_accounts', methods: ['POST'])]
-    public function updateSocialAccounts(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
-    {
-        // ✅ Lấy dữ liệu từ form
-        $csrfToken = $request->request->get('_csrf_token');
-        $socialAccountsJson = $request->request->get('social_accounts', '[]');
-
-        // ✅ Giải mã JSON
-        $socialAccounts = json_decode($socialAccountsJson, true);
-
-
-        // ✅ Kiểm tra CSRF Token
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-social-accounts', $csrfToken))) {
-            $this->addFlash('error', 'CSRF token không hợp lệ!');
-            return $this->redirectToRoute('profile');
-        }
-
-        // ✅ Chỉ cho phép 3 tài khoản mạng xã hội hợp lệ
-        $allowedAccounts = [
-            'github' => 'icons/github.png',
-            'linkedin' => 'icons/linkdn.png',
-            'instagram' => 'icons/instagram.png'
-        ];
-
-        $filteredAccounts = [];
-
-        foreach ($allowedAccounts as $key => $icon) {
-            if (!empty($socialAccounts) && is_array($socialAccounts)) {
+            foreach ($allowedAccounts as $key => $icon) {
                 foreach ($socialAccounts as $acc) {
-                    if (isset($acc['url']) && isset($acc['icon']) && $acc['icon'] === $icon) {
+                    if (isset($acc['url'], $acc['icon']) && $acc['icon'] === $icon) {
                         $filteredAccounts[] = [
                             'url' => $acc['url'],
                             'icon' => $icon
@@ -143,15 +78,24 @@ class ProfileController extends AbstractController
                     }
                 }
             }
+
+            $updateFields['socialAccounts'] = $filteredAccounts;
         }
 
-        // ✅ Cập nhật tài khoản mạng xã hội của profile
-        $isUpdated = $this->userService->updateCurrentUserProfile(['socialAccounts' => $filteredAccounts]);
+        // ✅ Các trường khác như avatar, banner, job, name, slug
+        foreach (['avatar', 'banner', 'slug', 'name', 'phone', 'job'] as $field) {
+            if (!empty($data[$field])) {
+                $updateFields[$field] = $data[$field];
+            }
+        }
+
+        // ✅ Gửi dữ liệu cập nhật đến service
+        $isUpdated = $this->userService->updateCurrentUserProfile($updateFields);
 
         if (!$isUpdated) {
-            $this->addFlash('error', 'Cập nhật tài khoản mạng xã hội thất bại.');
+            $this->addFlash('error', 'Cập nhật hồ sơ thất bại.');
         } else {
-            $this->addFlash('success', 'Cập nhật tài khoản mạng xã hội thành công.');
+            $this->addFlash('success', 'Cập nhật hồ sơ thành công.');
         }
 
         return $this->redirectToRoute('profile');
