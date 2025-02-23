@@ -2,15 +2,25 @@
 
 namespace App\Controller;
 
+use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class NewsController extends AbstractController
 {
+    private UserServiceInterface $userService;
+
+    public function __construct(UserServiceInterface $userService){
+        $this->userService = $userService;
+    }
+
     #[Route('/dashboard/news', name: 'news')]
     public function storiesAction(): Response
     {
+
+        $profile = $this->userService->getCurrentUserProfile();
+
         $user = [
             'avatar' => '/images/user_avatar.jpg'
         ];
@@ -62,7 +72,8 @@ class NewsController extends AbstractController
         return $this->render('news.html.twig', [
             'user' => $user,
             'stories' => $stories,
-            'post' => $post
+            'post' => $post,
+            'profile' => $profile
         ]);
     }
 }
