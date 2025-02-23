@@ -161,18 +161,44 @@
                     </form>
                 </div>
 
-                {# Social Media Accounts Section #}
+                {#SOCIAL#}
                 <div class="bg-gray-700 p-4 rounded-lg">
-                    <h3 class="text-lg font-semibold text-white">Social Media accounts</h3>
-                    <div class="mt-3 space-y-3">
-                        {% for account in user.social_accounts %}
-                            <a href="{{ account.url }}" target="_blank"
-                               class="flex items-center gap-2 p-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700">
-                                <img src="{{ asset(account.icon) }}" class="w-6 h-6">
-                                <span class="font-medium">{{ account.url }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
+                    <h3 class="text-lg font-semibold text-white">Social Media Accounts</h3>
+
+                    <!-- Form để gửi dữ liệu -->
+                    <form id="social-accounts-form" action="{{ path('update_social_accounts') }}" method="POST">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('update-social-accounts') }}">
+                        <input type="hidden" id="social-accounts-input" name="social_accounts" value="{{ profile.socialAccounts|json_encode }}">
+                        <div class="mt-3 space-y-3" id="social-accounts-list">
+                            {% set allowed_accounts = {
+                                'github': 'icons/github.png',
+                                'linkedin': 'icons/linkdn.png',
+                                'instagram': 'icons/instagram.png'
+                            } %}
+
+                            {% for key, icon in allowed_accounts %}
+                                {% set account = null %}
+                                {% for acc in profile.socialAccounts %}
+                                    {% if acc.icon == icon %}
+                                        {% set account = acc %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="flex items-center gap-2 p-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-300">
+                                    <img src="{{ asset(icon) }}" class="w-6 h-6">
+                                    <input type="text" name="socialAccounts[{{ key }}]"
+                                           value="{{ account ? account.url : '' }}"
+                                           class="w-full p-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
+                                           placeholder="Enter {{ key|capitalize }} URL">
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Nút submit -->
+                        <button type="submit" class="w-full mt-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            Save Accounts
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -235,6 +261,61 @@
                 interestsInput.value = interests.join(',');
                 console.log("Updated interests input value:", interestsInput.value);
             }
+        });
+    </script>
+    {#SOCIAL#}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let accountsInput = document.getElementById("social-accounts-input");
+
+            if (!accountsInput) {
+                console.error("Element #social-accounts-input not found.");
+                return;
+            }
+
+            let accounts = accountsInput.value ? JSON.parse(accountsInput.value) : [];
+
+            console.log("Initial accounts:", accounts);
+
+            function updateHiddenInput() {
+                // ✅ Loại bỏ trùng lặp
+                let seen = {};
+                accounts = accounts.filter(acc => {
+                    if (!seen[acc.icon]) {
+                        seen[acc.icon] = true;
+                        return true;
+                    }
+                    return false;
+                });
+
+                accountsInput.value = JSON.stringify(accounts);
+                console.log("Updated accounts before submit:", accountsInput.value);
+            }
+
+            document.querySelectorAll("#social-accounts-list input").forEach(inputField => {
+                inputField.addEventListener("input", function () {
+                    let key = this.getAttribute("name").replace("socialAccounts[", "").replace("]", "");
+                    let newUrl = this.value.trim();
+
+                    let icons = {
+                        "github": "icons/github.png",
+                        "linkedin": "icons/linkdn.png",
+                        "instagram": "icons/instagram.png"
+                    };
+
+                    // ✅ Cập nhật URL duy nhất cho mỗi icon
+                    accounts = accounts.filter(acc => acc.icon !== icons[key]);
+                    if (newUrl !== "") {
+                        accounts.push({ url: newUrl, icon: icons[key] });
+                    }
+
+                    updateHiddenInput();
+                });
+            });
+
+            document.getElementById("social-accounts-form").addEventListener("submit", function () {
+                updateHiddenInput();
+            });
         });
     </script>
 {% endblock %}

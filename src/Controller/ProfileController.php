@@ -26,6 +26,8 @@ class ProfileController extends AbstractController
 
         $profile = $this->userService->getCurrentUserProfile();
 
+//        dump($profile); exit;
+
         // Dữ liệu user (giả lập)
         $user = [
             'avatar' => '/images/avatar1.png',
@@ -124,4 +126,54 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('profile');
     }
 
+    #[Route('/user/profile/update-social-accounts', name: 'update_social_accounts', methods: ['POST'])]
+    public function updateSocialAccounts(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    {
+        // ✅ Lấy dữ liệu từ form
+        $csrfToken = $request->request->get('_csrf_token');
+        $socialAccountsJson = $request->request->get('social_accounts', '[]');
+
+        // ✅ Giải mã JSON
+        $socialAccounts = json_decode($socialAccountsJson, true);
+
+
+        // ✅ Kiểm tra CSRF Token
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-social-accounts', $csrfToken))) {
+            $this->addFlash('error', 'CSRF token không hợp lệ!');
+            return $this->redirectToRoute('profile');
+        }
+
+        // ✅ Chỉ cho phép 3 tài khoản mạng xã hội hợp lệ
+        $allowedAccounts = [
+            'github' => 'icons/github.png',
+            'linkedin' => 'icons/linkdn.png',
+            'instagram' => 'icons/instagram.png'
+        ];
+
+        $filteredAccounts = [];
+
+        foreach ($allowedAccounts as $key => $icon) {
+            if (!empty($socialAccounts) && is_array($socialAccounts)) {
+                foreach ($socialAccounts as $acc) {
+                    if (isset($acc['url']) && isset($acc['icon']) && $acc['icon'] === $icon) {
+                        $filteredAccounts[] = [
+                            'url' => $acc['url'],
+                            'icon' => $icon
+                        ];
+                    }
+                }
+            }
+        }
+
+        // ✅ Cập nhật tài khoản mạng xã hội của profile
+        $isUpdated = $this->userService->updateCurrentUserProfile(['socialAccounts' => $filteredAccounts]);
+
+        if (!$isUpdated) {
+            $this->addFlash('error', 'Cập nhật tài khoản mạng xã hội thất bại.');
+        } else {
+            $this->addFlash('success', 'Cập nhật tài khoản mạng xã hội thành công.');
+        }
+
+        return $this->redirectToRoute('profile');
+    }
 }
