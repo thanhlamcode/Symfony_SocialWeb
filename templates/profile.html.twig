@@ -129,16 +129,36 @@
                 {# Industry/Interests Section #}
                 <div class="bg-gray-700 p-4 rounded-lg mb-6">
                     <h3 class="text-lg font-semibold text-white">Industry/Interests</h3>
-                    <div class="flex flex-wrap gap-2 mt-3">
-                        {% for interest in user.interests %}
-                            <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-                            {{ interest }} ×
-                        </span>
-                        {% endfor %}
-                    </div>
-                    <button class="w-full mt-3 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700">
-                        + Add more
-                    </button>
+
+                    <!-- Form để gửi dữ liệu -->
+                    <form id="interests-form" action="{{ path('update_interests') }}" method="POST">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('update-interests') }}">
+
+                        <div class="flex flex-wrap gap-2 mt-3" id="interests-list">
+                            {% for interest in profile.interests %}
+                                <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                    {{ interest }}
+                    <button type="button" class="ml-2 text-red-400 remove-interest" data-interest="{{ interest }}">×</button>
+                </span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Input ẩn để nhập sở thích mới -->
+                        <input type="text" id="new-interest" class="w-full mt-3 p-2 border border-gray-600 rounded-lg bg-gray-800 text-white hidden" placeholder="Enter new interest">
+
+                        <!-- Trường ẩn chứa danh sách sở thích -->
+                        <input type="hidden" name="interests" id="interests-input" value="{{ user.interests|join(',') }}">
+
+                        <!-- Nút thêm -->
+                        <button type="button" id="add-interest-btn" class="w-full mt-3 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700">
+                            + Add more
+                        </button>
+
+                        <!-- Nút submit -->
+                        <button type="submit" class="w-full mt-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            Save Interests
+                        </button>
+                    </form>
                 </div>
 
                 {# Social Media Accounts Section #}
@@ -160,4 +180,61 @@
 
     {# Include Alert Component #}
     {% include 'components/alert.html.twig' %}
+
+    {#UPDATE#}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let interestsList = document.getElementById("interests-list");
+            let inputField = document.getElementById("new-interest");
+            let addButton = document.getElementById("add-interest-btn");
+            let interestsInput = document.getElementById("interests-input");
+
+            // Chuyển chuỗi interests thành mảng
+            let interests = interestsInput.value ? interestsInput.value.split(',') : [];
+            console.log("Initial interests:", interests);
+
+            // Khi nhấn "+ Add more", hiển thị input
+            addButton.addEventListener("click", function() {
+                console.log("Add button clicked");
+                if (inputField.classList.contains("hidden")) {
+                    inputField.classList.remove("hidden");
+                    inputField.focus();
+                    console.log("Input field shown");
+                } else {
+                    let interest = inputField.value.trim();
+                    console.log("Entered interest:", interest);
+                    if (interest !== "" && !interests.includes(interest)) {
+                        interests.push(interest);
+                        console.log("Updated interests:", interests);
+                        updateInterestList();
+                        inputField.value = "";
+                        inputField.classList.add("hidden");
+                    }
+                }
+            });
+
+            // Xóa sở thích khi nhấn "×"
+            document.addEventListener("click", function(event) {
+                if (event.target.classList.contains("remove-interest")) {
+                    let interestToRemove = event.target.getAttribute("data-interest");
+                    console.log("Removing interest:", interestToRemove);
+                    interests = interests.filter(i => i !== interestToRemove);
+                    console.log("Updated interests after removal:", interests);
+                    updateInterestList();
+                }
+            });
+
+            // Cập nhật danh sách hiển thị và input ẩn
+            function updateInterestList() {
+                console.log("Updating interest list...");
+                interestsList.innerHTML = interests.map(interest => `
+            <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                ${interest} <button type="button" class="ml-2 text-red-400 remove-interest" data-interest="${interest}">×</button>
+            </span>
+        `).join('');
+                interestsInput.value = interests.join(',');
+                console.log("Updated interests input value:", interestsInput.value);
+            }
+        });
+    </script>
 {% endblock %}

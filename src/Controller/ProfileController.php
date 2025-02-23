@@ -98,4 +98,30 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('profile');
     }
+
+    #[Route('/user/profile/update-interests', name: 'update_interests', methods: ['POST'])]
+    public function updateInterests(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    {
+        // ✅ Lấy dữ liệu từ form
+        $csrfToken = $request->request->get('_csrf_token');
+        $interests = explode(',', $request->request->get('interests', ''));
+
+        // ✅ Kiểm tra CSRF Token
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-interests', $csrfToken))) {
+            $this->addFlash('error', 'CSRF token không hợp lệ!');
+            return $this->redirectToRoute('profile');
+        }
+
+        // ✅ Cập nhật sở thích của user
+        $isUpdated = $this->userService->updateCurrentUserProfile(['interests' => $interests]);
+
+        if (!$isUpdated) {
+            $this->addFlash('error', 'Cập nhật sở thích thất bại.');
+        } else {
+            $this->addFlash('success', 'Cập nhật sở thích thành công.');
+        }
+
+        return $this->redirectToRoute('profile');
+    }
+
 }
