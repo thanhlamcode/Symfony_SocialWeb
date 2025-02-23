@@ -74,4 +74,28 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('profile');
     }
 
+    #[Route('/user/profile/update-bio', name: 'update_bio', methods: ['POST'])]
+    public function updateBio(Request $request, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    {
+        // ✅ Lấy dữ liệu từ form
+        $bio = $request->request->get('bio');
+        $csrfToken = $request->request->get('_csrf_token');
+
+        // ✅ Kiểm tra CSRF Token
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('update-bio', $csrfToken))) {
+            $this->addFlash('error', 'CSRF token không hợp lệ!');
+            return $this->redirectToRoute('profile');
+        }
+
+        // ✅ Chỉ cập nhật trường "bio"
+        $isUpdated = $this->userService->updateCurrentUserProfile(['bio' => $bio]);
+
+        if (!$isUpdated) {
+            $this->addFlash('error', 'Cập nhật bio thất bại.');
+        } else {
+            $this->addFlash('success', 'Cập nhật bio thành công.');
+        }
+
+        return $this->redirectToRoute('profile');
+    }
 }
