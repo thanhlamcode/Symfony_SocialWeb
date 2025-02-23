@@ -100,4 +100,21 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('profile');
     }
+
+    #[Route('/dashboard/profile/{slug}', name: 'profile_by_slug', methods: ['GET'])]
+    public function viewProfileBySlug(string $slug, UserServiceInterface $userService): Response
+    {
+        $profileDetail = $userService->getProfileBySlug($slug);
+        $profile = $userService->getCurrentUserProfile();
+
+        if (!$profileDetail) {
+            throw $this->createNotFoundException('Profile not found');
+        }
+
+        return $this->render('porfolio.html.twig', [
+            'profileDetail' => $profileDetail,
+            'profile' => $profile
+        ]);
+    }
+
 }

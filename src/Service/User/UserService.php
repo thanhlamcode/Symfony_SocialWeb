@@ -114,4 +114,50 @@ class UserService implements UserServiceInterface
 
         return true; // Cập nhật hoặc tạo mới thành công
     }
+
+    /**
+     * Lấy Profile theo slug
+     */
+    public function getProfileBySlug(string $slug): ?array
+    {
+        $profile = $this->profileRepository->findBySlug($slug);
+
+        if (!$profile) {
+            return null;
+        }
+
+        return $this->mapProfileToArray($profile);
+    }
+
+    /**
+     * Chuyển đổi Profile Entity thành mảng dữ liệu
+     */
+    private function mapProfileToArray(mixed $profile, ?User $user = null): ?array
+    {
+        if (!$profile) {
+            return null;
+        }
+
+        // Nếu profile là mảng, chuyển nó thành object Profile
+        if (is_array($profile)) {
+            $profile = (object) $profile;
+        }
+
+        $defaultAvatar = "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg";
+
+        return [
+            'id' => $profile->id ?? null,
+            'userId' => $user?->getId(),
+            'name' => $profile->name ?? $user?->getEmail(),
+            'email' => $user?->getEmail() ?? null,
+            'phone' => $profile->phone ?? null,
+            'avatar' => $profile->avatar ?? $defaultAvatar,
+            'bio' => $profile->bio ?? null,
+            'interests' => $profile->interests ?? [],
+            'banner' => $profile->banner ?? null,
+            'socialAccounts' => $profile->socialAccounts ?? [],
+            'slug' => $profile->slug ?? null,
+            'job' => $profile->job ?? null,
+        ];
+    }
 }

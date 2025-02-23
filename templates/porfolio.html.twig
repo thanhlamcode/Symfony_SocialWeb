@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+
+    <div class="flex h-screen w-full bg-gray-900 text-white">
+        {% include 'components/sidebar.html.twig' %}
+
+        {# Cột trái - Thông tin cá nhân #}
+        <div class="w-[50%] flex justify-center items-center p-6 overflow-y-auto">
+            <div class="w-full max-w-3xl bg-gray-800 rounded-lg shadow-lg p-6">
+
+                {# Header #}
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white mt-12">User Profile</h2>
+                </div>
+
+                {# Banner & Avatar #}
+                <div class="relative mt-4">
+                    <img src="{{ profileDetail.banner }}" alt="Banner" class="w-full h-32 object-cover rounded-lg">
+                    <div class="absolute -bottom-8 left-6 flex items-center">
+                        <img src="{{ profileDetail.avatar ?: 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg' }}"
+                             alt="Profile Avatar" class="w-24 h-24 rounded-full border-4 border-gray-700 shadow-lg">
+                        <div class="mt-1 ml-4">
+                            <p class="font-semibold text-white">{{ profileDetail.name ?: profileDetail.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Personal Information #}
+                <div class="mt-6 bg-gray-700 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-white">Personal Information</h3>
+
+                    <div class="mt-3">
+                        <label class="text-sm text-gray-400">Full Name</label>
+                        <p class="text-white">{{ profileDetail.name ?: profileDetail.email }}</p>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="text-sm text-gray-400">Email</label>
+                        <p class="text-white">{{ profileDetail.email ?: 'Chưa có email' }}</p>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="text-sm text-gray-400">Phone Number</label>
+                        <p class="text-white">{{ profileDetail.phone ?: 'Chưa cập nhật' }}</p>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="text-sm text-gray-400">Job</label>
+                        <p class="text-white">{{ profileDetail.job ?: 'Chưa biết' }}</p>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="text-sm text-gray-400">Slug</label>
+                        <p class="text-white">{{ profileDetail.slug ?: 'Không có slug' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Cột phải - Bio, Interests, Social Media #}
+        <div class="w-[50%] flex justify-center items-center p-6 h-full overflow-y-auto">
+            <div class="w-full max-w-2xl bg-gray-800 rounded-lg shadow-lg p-6 mt-20">
+
+                {# Bio Section #}
+                <div class="bg-gray-700 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold text-white">Bio</h3>
+                    <p class="text-gray-300 mt-2">{{ profileDetail.bio ?: 'Chưa có bio' }}</p>
+                </div>
+
+                {# Industry/Interests Section #}
+                <div class="bg-gray-700 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold text-white">Industry/Interests</h3>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        {% for interest in profileDetail.interests %}
+                            <span class="bg-blue-900 text-blue-400 px-3 py-1 rounded-full text-sm font-medium">
+                            {{ interest }}
+                        </span>
+                        {% else %}
+                            <p class="text-gray-300">Chưa có sở thích nào.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {# Social Media Accounts #}
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-white">Social Media Accounts</h3>
+                    <div class="mt-3 space-y-3">
+                        {% set allowed_accounts = {
+                            'github': 'icons/github.png',
+                            'linkedin': 'icons/linkdn.png',
+                            'instagram': 'icons/instagram.png'
+                        } %}
+
+                        {% for key, icon in allowed_accounts %}
+                            {% set account = null %}
+                            {% for acc in profileDetail.socialAccounts %}
+                                {% if acc.icon == icon %}
+                                    {% set account = acc %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="flex items-center gap-2 p-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-300">
+                                <img src="{{ asset(icon) }}" class="w-6 h-6">
+                                <p class="w-full text-white">
+                                    {% if account %}
+                                        <a href="{{ account.url }}" target="_blank" class="underline hover:text-blue-400">
+                                            {{ account.url }}
+                                        </a>
+                                    {% else %}
+                                        Không có tài khoản {{ key|capitalize }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
