@@ -2,15 +2,24 @@
 
 namespace App\Controller;
 
+use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class FriendController extends AbstractController
 {
+    private UserServiceInterface $userService;
+
+    public function __construct(UserServiceInterface $userService){
+        $this->userService = $userService;
+    }
+
     #[Route('/dashboard/friend', name: 'friends')]
     public function friends(): Response
     {
+        $profile = $this->userService->getCurrentUserProfile();
+
         $friendRequests = [
             [
                 'name' => 'Như Như',
@@ -74,6 +83,7 @@ class FriendController extends AbstractController
         return $this->render('friend.html.twig', [
             'friend_requests' => $friendRequests,
             'users' => $users,
+            'profile' => $profile
         ]);
     }
 }
