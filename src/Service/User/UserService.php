@@ -87,9 +87,10 @@ class UserService implements UserServiceInterface
         }
         if (!empty($data['slug'])) {
             $profile->setSlug($data['slug']);
-        } else {
-            $profile->setSlug(strtolower(str_replace(' ', '-', $profile->getName() ?? 'user-' . $user->getId())));
         }
+//        } else {
+//            $profile->setSlug(strtolower(str_replace(' ', '-', $profile->getName() ?? 'user-' . $user->getId())));
+//        }
         if (!empty($data['name'])) {
             $profile->setName($data['name']);
         }
