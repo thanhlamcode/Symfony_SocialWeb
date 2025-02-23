@@ -40,7 +40,7 @@ class Profile
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     private ?string $slug = null;
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $job = null;
 
     public function getJob(): ?string

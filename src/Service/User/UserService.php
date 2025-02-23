@@ -72,7 +72,7 @@ class UserService implements UserServiceInterface
         // Tìm Profile theo User ID
         $profile = $this->profileRepository->findByUserId($user->getId());
 
-        // Nếu không tìm thấy Profile, tạo mới
+        // Nếu không tìm thấy Profile, tạo mới và gán User ID
         if (!$profile) {
             $profile = new Profile();
             $profile->setUserId($user->getId());
@@ -87,6 +87,8 @@ class UserService implements UserServiceInterface
         }
         if (!empty($data['slug'])) {
             $profile->setSlug($data['slug']);
+        } else {
+            $profile->setSlug(strtolower(str_replace(' ', '-', $profile->getName() ?? 'user-' . $user->getId())));
         }
         if (!empty($data['name'])) {
             $profile->setName($data['name']);
@@ -95,7 +97,7 @@ class UserService implements UserServiceInterface
             $profile->setPhone($data['phone']);
         }
         if (!empty($data['job'])) {
-            $profile->setJob($data['job']); // Sử dụng đúng setter
+            $profile->setJob($data['job']);
         }
         if (!empty($data['bio'])) {
             $profile->setBio($data['bio']);
