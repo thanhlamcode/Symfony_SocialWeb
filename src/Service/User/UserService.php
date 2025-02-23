@@ -138,26 +138,26 @@ class UserService implements UserServiceInterface
             return null;
         }
 
-        // Nếu profile là mảng, chuyển nó thành object Profile
-        if (is_array($profile)) {
-            $profile = (object) $profile;
+        // Nếu profile là mảng, lấy phần tử đầu tiên (Profile object)
+        if (is_array($profile) && isset($profile[0]) && $profile[0] instanceof Profile) {
+            $profile = $profile[0];
         }
 
         $defaultAvatar = "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg";
 
         return [
-            'id' => $profile->id ?? null,
+            'id' => $profile->getId() ?? null,
             'userId' => $user?->getId(),
-            'name' => $profile->name ?? $user?->getEmail(),
+            'name' => $profile->getName() ?? $user?->getEmail(),
             'email' => $user?->getEmail() ?? null,
-            'phone' => $profile->phone ?? null,
-            'avatar' => $profile->avatar ?? $defaultAvatar,
-            'bio' => $profile->bio ?? null,
-            'interests' => $profile->interests ?? [],
-            'banner' => $profile->banner ?? null,
-            'socialAccounts' => $profile->socialAccounts ?? [],
-            'slug' => $profile->slug ?? null,
-            'job' => $profile->job ?? null,
+            'phone' => $profile->getPhone() ?? null,
+            'avatar' => $profile->getAvatar() ?? $defaultAvatar,
+            'bio' => $profile->getBio() ?? null,
+            'interests' => $profile->getInterests() ?? [],
+            'banner' => $profile->getBanner() ?? null,
+            'socialAccounts' => $profile->getSocialAccounts() ?? [],
+            'slug' => $profile->getSlug() ?? null,
+            'job' => $profile->getJob() ?? null,
         ];
     }
 }
