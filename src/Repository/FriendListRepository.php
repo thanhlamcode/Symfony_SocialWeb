@@ -21,15 +21,22 @@ class FriendListRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT \"u\".\"id\", \"u\".\"email\"
-        FROM \"user\" AS \"u\"
-        WHERE \"u\".\"id\" != :currentUserId
-        AND \"u\".\"id\" NOT IN (
-            SELECT \"f\".\"receiver_id\" FROM \"friend_list\" AS \"f\" WHERE \"f\".\"sender_id\" = :currentUserId
-            UNION
-            SELECT \"f\".\"sender_id\" FROM \"friend_list\" AS \"f\" WHERE \"f\".\"receiver_id\" = :currentUserId
-        )
-    ";
+            SELECT 
+                u.id, 
+                u.email, 
+                p.avatar, 
+                p.name, 
+                p.slug
+            FROM \"user\" AS u
+            LEFT JOIN profile AS p ON u.id = p.user_id
+            WHERE u.id != :currentUserId
+            AND u.id NOT IN (
+                SELECT f.receiver_id FROM friend_list AS f WHERE f.sender_id = :currentUserId
+                UNION
+                SELECT f.sender_id FROM friend_list AS f WHERE f.receiver_id = :currentUserId
+            )
+        ";
+
 
         $stmt = $conn->prepare($sql);
         $stmt->bindValue('currentUserId', (string) $currentUserId, \PDO::PARAM_STR); // Ép kiểu string
