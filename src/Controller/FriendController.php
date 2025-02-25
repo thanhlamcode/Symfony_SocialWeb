@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\FriendService;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,15 +11,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class FriendController extends AbstractController
 {
     private UserServiceInterface $userService;
+    private FriendService $friendService;
 
-    public function __construct(UserServiceInterface $userService){
+    public function __construct(UserServiceInterface $userService, FriendService $friendService){
         $this->userService = $userService;
+        $this->friendService = $friendService;
     }
 
     #[Route('/dashboard/friend', name: 'friends')]
     public function friends(): Response
     {
         $profile = $this->userService->getCurrentUserProfile();
+
+        $data = $this->friendService->getAvailableUsers();
+
+        dump($data); exit();
 
         $friendRequests = [
             [
