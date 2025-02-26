@@ -65,4 +65,47 @@ class FriendService
 
         return $users;
     }
+
+    public function isFriendRequestSent(int $receiverId): bool
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return false;
+        }
+
+        return $this->friendListRepository->isFriendRequestSent($user->getId(), $receiverId);
+    }
+
+
+    /**
+     * Gửi lời mời kết bạn
+     */
+    public function sendFriendRequest(int $receiverId): bool
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return false;
+        }
+
+        return $this->friendListRepository->sendFriendRequest($user->getId(), $receiverId);
+    }
+
+    /**
+     * Hủy lời mời kết bạn
+     */
+    public function cancelFriendRequest(int $receiverId): bool
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return false;
+        }
+
+        return $this->friendListRepository->cancelFriendRequest($user->getId(), $receiverId);
+    }
 }

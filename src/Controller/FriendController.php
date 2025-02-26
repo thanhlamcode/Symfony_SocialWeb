@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Service\FriendService;
 use App\Service\User\UserServiceInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -27,7 +30,7 @@ class FriendController extends AbstractController
 
         $friendRequests = $this->friendService->getFriendRequests();
 
-       dump($friendRequests); exit();
+//       dump($otherPeople); exit();
 
         $friendRequests = [
             [
@@ -95,5 +98,31 @@ class FriendController extends AbstractController
             'profile' => $profile,
             'otherPeople' => $otherPeople
         ]);
+    }
+
+    #[Route('/friend-request/toggle', name: 'toggle_friend_request', methods: ['POST'])]
+    public function toggleFriendRequest(Request $request, FriendService $friendService): Response
+    {
+        $receiverId = $request->request->get('receiverId');
+        $csrfToken = $request->request->get('_token');
+
+        // Kiểm tra CSRF token
+        if (!$this->isCsrfTokenValid('toggle_friend_request', $csrfToken)) {
+            $this->addFlash('error', 'CSRF Token không hợp lệ!');
+            return $this->redirectToRoute('friends'); // Hoặc route phù hợp
+        }
+
+        // Kiểm tra trạng thái hiện tại
+        $isSent = $friendService->isFriendRequestSent($receiverId);
+
+        if ($isSent) {
+            $friendService->cancelFriendRequest($receiverId);
+            $this->addFlash('success', 'Hủy lời mời kết bạn thành công!');
+        } else {
+            $friendService->sendFriendRequest($receiverId);
+            $this->addFlash('success', 'Gửi lời mời kết bạn thành công!');
+        }
+
+        return $this->redirectToRoute('friends'); // Hoặc route phù hợp
     }
 }
