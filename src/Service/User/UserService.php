@@ -123,11 +123,14 @@ class UserService implements UserServiceInterface
     {
         $profile = $this->profileRepository->findBySlug($slug);
 
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
         if (!$profile) {
             return null;
         }
 
-        return $this->mapProfileToArray($profile);
+        return $this->mapProfileToArray($profile, $user);
     }
 
     /**
@@ -149,8 +152,8 @@ class UserService implements UserServiceInterface
         return [
             'id' => $profile->getId() ?? null,
             'userId' => $user?->getId(),
-            'name' => $profile->getName() ?? $user?->getEmail(),
-            'email' => $user?->getEmail() ?? null,
+            'name' => $profile->getName() ?? $user?->getEmail(), // Nếu name null, lấy email
+            'email' => $user?->getEmail() ?? null, // Bổ sung email
             'phone' => $profile->getPhone() ?? null,
             'avatar' => $profile->getAvatar() ?? $defaultAvatar,
             'bio' => $profile->getBio() ?? null,
