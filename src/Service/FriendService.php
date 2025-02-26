@@ -41,4 +41,28 @@ class FriendService
 
         return $users;
     }
+
+    public function getFriendRequests(): array
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return [];
+        }
+
+        $users = $this->friendListRepository->findFriendRequests((string) $user->getId());
+
+        // Mặc định avatar nếu bị null
+        $defaultAvatar = "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg";
+
+        // Xử lý dữ liệu để thay thế giá trị null
+        foreach ($users as &$userData) {
+            $userData['avatar'] = $userData['avatar'] ?? $defaultAvatar;
+            $userData['name'] = $userData['name'] ?? $userData['email']; // Nếu name null, lấy email làm name
+            $userData['slug'] = $userData['slug'] ?? "Người dùng chưa tạo slug"; // Nếu slug null
+        }
+
+        return $users;
+    }
 }

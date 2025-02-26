@@ -25,7 +25,9 @@ class FriendController extends AbstractController
 
         $otherPeople = $this->friendService->getAvailableUsers();
 
-//        dump($otherPeople); exit();
+        $friendRequests = $this->friendService->getFriendRequests();
+
+       dump($friendRequests); exit();
 
         $friendRequests = [
             [

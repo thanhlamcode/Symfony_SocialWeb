@@ -44,4 +44,29 @@ class FriendListRepository extends ServiceEntityRepository
 
         return $stmt->executeQuery()->fetchAllAssociative();
     }
+
+    public function findFriendRequests(string $currentUserId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT 
+            u.id, 
+            u.email, 
+            COALESCE(p.avatar, 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg') AS avatar, 
+            COALESCE(p.name, u.email) AS name, 
+            COALESCE(p.slug, 'Người dùng chưa tạo slug') AS slug
+        FROM \"friend_list\" AS f
+        INNER JOIN \"user\" AS u ON f.sender_id = u.id
+        LEFT JOIN \"profile\" AS p ON u.id = p.user_id
+        WHERE f.receiver_id = :currentUserId
+        AND f.status = 'pending'
+    ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('currentUserId', (string) $currentUserId, \PDO::PARAM_STR); // Ép kiểu string
+        $stmt->execute();
+
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
 }
