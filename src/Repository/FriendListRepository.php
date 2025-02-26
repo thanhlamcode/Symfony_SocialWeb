@@ -143,4 +143,57 @@ class FriendListRepository extends ServiceEntityRepository
 
         return true;
     }
+
+    public function getFriendRequests(): array
+    {
+        $currentUserId = $this->security->getUser()->getId();
+
+        return $this->entityManager->getRepository(FriendList::class)->createQueryBuilder('f')
+            ->select('u.id, u.name, u.slug, p.avatar')
+            ->leftJoin('App\Entity\User', 'u', 'WITH', 'u.id = f.senderId')
+            ->leftJoin('App\Entity\Profile', 'p', 'WITH', 'p.user_id = u.id')
+            ->where('f.receiverId = :currentUserId')
+            ->andWhere('f.status = :pending')
+            ->setParameter('currentUserId', $currentUserId)
+            ->setParameter('pending', 'pending')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Chấp nhận lời mời kết bạn.
+     */
+    public function acceptFriendRequest(int $senderId, int $receiverId): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            UPDATE friend_list 
+            SET status = 'accepted' 
+            WHERE sender_id = :senderId 
+            AND receiver_id = :receiverId 
+            AND status = 'pending'
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['senderId' => $senderId, 'receiverId' => $receiverId]);
+    }
+
+    /**
+     * Từ chối lời mời kết bạn.
+     */
+    public function declineFriendRequest(int $senderId, int $receiverId): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            DELETE FROM friend_list 
+            WHERE sender_id = :senderId 
+            AND receiver_id = :receiverId 
+            AND status = 'pending'
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['senderId' => $senderId, 'receiverId' => $receiverId]);
+    }
 }

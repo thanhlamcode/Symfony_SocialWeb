@@ -63,4 +63,43 @@ class FriendController extends AbstractController
 
         return $this->redirectToRoute('friends'); // Hoặc route phù hợp
     }
+
+    #[Route('/friend-request/accept', name: 'accept_friend_request', methods: ['POST'])]
+    public function acceptFriendRequest(Request $request, FriendService $friendService): Response
+    {
+        $senderId = $request->request->get('senderId');
+        $csrfToken = $request->request->get('_token');
+
+        // Kiểm tra CSRF token
+        if (!$this->isCsrfTokenValid('accept_friend_request', $csrfToken)) {
+            $this->addFlash('error', 'CSRF Token không hợp lệ!');
+            return $this->redirectToRoute('friends');
+        }
+
+        // Chấp nhận lời mời kết bạn
+        $friendService->acceptFriendRequest($senderId);
+        $this->addFlash('success', 'Bạn đã chấp nhận lời mời kết bạn.');
+
+        return $this->redirectToRoute('friends');
+    }
+
+    #[Route('/friend-request/decline', name: 'decline_friend_request', methods: ['POST'])]
+    public function declineFriendRequest(Request $request, FriendService $friendService): Response
+    {
+        $senderId = $request->request->get('senderId');
+        $csrfToken = $request->request->get('_token');
+
+        // Kiểm tra CSRF token
+        if (!$this->isCsrfTokenValid('decline_friend_request', $csrfToken)) {
+            $this->addFlash('error', 'CSRF Token không hợp lệ!');
+            return $this->redirectToRoute('friends');
+        }
+
+        // Hủy lời mời kết bạn
+        $friendService->declineFriendRequest($senderId);
+        $this->addFlash('success', 'Bạn đã từ chối lời mời kết bạn.');
+
+        return $this->redirectToRoute('friends');
+    }
+
 }

@@ -24,15 +24,27 @@
 
                             {# Nút hành động #}
                             <div class="mt-4 flex flex-col gap-2 w-full">
-                                <form action="{{ path('toggle_friend_request') }}" method="POST" class="w-full">
-                                    <input type="hidden" name="receiverId" value="{{ friendRequest.id }}">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_friend_request') }}">
+                                {# Form xác nhận lời mời kết bạn #}
+                                <form action="{{ path('accept_friend_request') }}" method="POST" class="w-full">
+                                    <input type="hidden" name="senderId" value="{{ friendRequest.id }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('accept_friend_request') }}">
 
-                                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                                        Xác nhận
+                                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+                                        Xác nhận kết bạn
                                     </button>
                                 </form>
 
+                                {# Form hủy lời mời kết bạn #}
+                                <form action="{{ path('decline_friend_request') }}" method="POST" class="w-full">
+                                    <input type="hidden" name="senderId" value="{{ friendRequest.id }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('decline_friend_request') }}">
+
+                                    <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
+                                        Hủy lời mời
+                                    </button>
+                                </form>
+
+                                {# Nút xem trang cá nhân #}
                                 <a href="/dashboard/profile/{{ friendRequest.slug }}" class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition text-center">
                                     Xem hồ sơ
                                 </a>
@@ -40,6 +52,7 @@
                         </div>
                     {% endfor %}
                 </div>
+
             </div>
         </div>
 

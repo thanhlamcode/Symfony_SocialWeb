@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\FriendList;
 use App\Repository\FriendListRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -108,4 +109,33 @@ class FriendService
 
         return $this->friendListRepository->cancelFriendRequest($user->getId(), $receiverId);
     }
+
+    /**
+     * Chấp nhận lời mời kết bạn.
+     */
+    public function acceptFriendRequest(int $senderId): void
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return;
+        }
+
+        $this->friendListRepository->acceptFriendRequest($senderId, $user->getId());
+    }
+
+    /**
+     * Từ chối lời mời kết bạn.
+     */
+    public function declineFriendRequest(int $senderId): void
+    {
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+        if (!$user || !($user instanceof \App\Entity\User)) {
+            return;
+        }
+
+        $this->friendListRepository->declineFriendRequest($senderId, $user->getId());
+    }
+
 }
