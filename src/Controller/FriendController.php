@@ -23,9 +23,9 @@ class FriendController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
-        $data = $this->friendService->getAvailableUsers();
+        $otherPeople = $this->friendService->getAvailableUsers();
 
-        dump($data); exit();
+//        dump($otherPeople); exit();
 
         $friendRequests = [
             [
@@ -90,7 +90,8 @@ class FriendController extends AbstractController
         return $this->render('friend.html.twig', [
             'friend_requests' => $friendRequests,
             'users' => $users,
-            'profile' => $profile
+            'profile' => $profile,
+            'otherPeople' => $otherPeople
         ]);
     }
 }
