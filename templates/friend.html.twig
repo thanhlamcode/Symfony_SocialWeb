@@ -49,11 +49,10 @@
                 {# Tiêu đề + Link xem tất cả #}
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold">Danh sách người dùng</h2>
-                    <a href="#" class="text-blue-400 hover:underline">Xem tất cả</a>
                 </div>
 
                 {# Danh sách người dùng #}
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                     {% for friend in otherPeople %}
                         <div class="bg-gray-800 rounded-xl overflow-hidden shadow-lg h-full flex flex-col justify-between min-h-[350px]">
 
@@ -74,7 +73,7 @@
                                 </button>
 
                                 {% if friend.slug %}
-                                    <a href="/profile/{{ friend.slug }}" class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition text-center">
+                                    <a href="/dashboard/profile/{{ friend.slug }}" class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition text-center">
                                         Xem trang cá nhân
                                     </a>
                                 {% else %}
