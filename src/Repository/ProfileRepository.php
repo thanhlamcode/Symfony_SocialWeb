@@ -75,4 +75,14 @@ class ProfileRepository extends ServiceEntityRepository
 
         return $profile;
     }
+
+    public function findBySlug(string $slug): ?Profile
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult(); // Luôn trả về một object Profile hoặc null
+    }
+
 }

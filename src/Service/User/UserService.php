@@ -2,6 +2,7 @@
 
 namespace App\Service\User;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Repository\ProfileRepository;
 use App\Entity\Profile;
@@ -11,11 +12,13 @@ class UserService implements UserServiceInterface
 {
     private TokenStorageInterface $tokenStorage;
     private ProfileRepository $profileRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(TokenStorageInterface $tokenStorage, ProfileRepository $profileRepository)
+    public function __construct(TokenStorageInterface $tokenStorage, ProfileRepository $profileRepository, EntityManagerInterface $entityManager)
     {
         $this->tokenStorage = $tokenStorage;
         $this->profileRepository = $profileRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -123,12 +126,12 @@ class UserService implements UserServiceInterface
     {
         $profile = $this->profileRepository->findBySlug($slug);
 
-        $token = $this->tokenStorage->getToken();
-        $user = $token?->getUser();
-
         if (!$profile) {
             return null;
         }
+
+        // Tìm User theo userId có trong Profile
+        $user = $this->entityManager->getRepository(User::class)->find($profile->getUserId());
 
         return $this->mapProfileToArray($profile, $user);
     }
@@ -152,8 +155,8 @@ class UserService implements UserServiceInterface
         return [
             'id' => $profile->getId() ?? null,
             'userId' => $user?->getId(),
-            'name' => $profile->getName() ?? $user?->getEmail(), // Nếu name null, lấy email
-            'email' => $user?->getEmail() ?? null, // Bổ sung email
+            'name' => $profile->getName() ?? $user?->getEmail(), // Nếu Name null, dùng Email
+            'email' => $user?->getEmail() ?? null, // Bổ sung email từ User
             'phone' => $profile->getPhone() ?? null,
             'avatar' => $profile->getAvatar() ?? $defaultAvatar,
             'bio' => $profile->getBio() ?? null,
@@ -164,4 +167,5 @@ class UserService implements UserServiceInterface
             'job' => $profile->getJob() ?? null,
         ];
     }
+
 }
