@@ -2,15 +2,24 @@
 
 namespace App\Controller;
 
+use App\Service\User\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ChatController extends AbstractController
 {
+    private UserService $userService;
+
+    public function __construct(UserService $userService){
+        $this->userService = $userService;
+    }
+
     #[Route('/dashboard/message/{id}', name: 'chat_message')]
     public function message(int $id): Response
     {
+        $profile = $this->userService->getCurrentUserProfile();
+
         // Danh sách cuộc trò chuyện với tin nhắn
         $chatList = [
             [
@@ -71,7 +80,8 @@ class ChatController extends AbstractController
         return $this->render('message.html.twig', [
             'chat_list' => $chatList,  // Toàn bộ danh sách trò chuyện
             'current_chat' => $currentChat, // Cuộc trò chuyện đang hiển thị
-            'user' => $user
+            'user' => $user,
+            'profile' => $profile
         ]);
     }
 }
