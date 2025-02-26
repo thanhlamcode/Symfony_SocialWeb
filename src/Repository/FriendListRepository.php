@@ -26,14 +26,24 @@ class FriendListRepository extends ServiceEntityRepository
                 u.email, 
                 p.avatar, 
                 p.name, 
-                p.slug
+                p.slug,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 
+                        FROM friend_list AS f 
+                        WHERE f.sender_id = :currentUserId 
+                        AND f.receiver_id = u.id 
+                        AND f.status = 'pending'
+                    ) THEN 'requested'
+                    ELSE 'not_requested'
+                END AS request_status
             FROM \"user\" AS u
             LEFT JOIN profile AS p ON u.id = p.user_id
             WHERE u.id != :currentUserId
             AND u.id NOT IN (
-                SELECT f.receiver_id FROM friend_list AS f WHERE f.sender_id = :currentUserId
+                SELECT f.receiver_id FROM friend_list AS f WHERE f.sender_id = :currentUserId AND f.status = 'accepted'
                 UNION
-                SELECT f.sender_id FROM friend_list AS f WHERE f.receiver_id = :currentUserId
+                SELECT f.sender_id FROM friend_list AS f WHERE f.receiver_id = :currentUserId AND f.status = 'accepted'
             )
         ";
 
