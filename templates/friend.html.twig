@@ -68,32 +68,27 @@
 
                             {# Nút hành động #}
                             <div class="p-4 flex flex-col gap-2">
-                                {% if friend.request_status == 'requested' %}
-                                    <button class="w-full bg-gray-500 text-white py-2 rounded-lg cursor-not-allowed">
-                                        Đã gửi lời mời
-                                    </button>
-                                {% else %}
-                                    <form action="{{ path('toggle_friend_request') }}" method="POST" class="w-full">
-                                        <input type="hidden" name="receiverId" value="{{ friend.id }}">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('toggle_friend_request') }}">
+                                <form action="{{ path('toggle_friend_request') }}" method="POST" class="w-full">
+                                    <input type="hidden" name="receiverId" value="{{ friend.id }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_friend_request') }}">
 
+                                    {% if friend.request_status == 'requested' %}
+                                        <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
+                                            Hủy lời mời kết bạn
+                                        </button>
+                                    {% else %}
                                         <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
                                             Gửi lời mời kết bạn
                                         </button>
-                                    </form>
-                                {% endif %}
-
+                                    {% endif %}
+                                </form>
+                                {# Nút Xem trang cá nhân #}
                                 {% if friend.slug %}
                                     <a href="/dashboard/profile/{{ friend.slug }}" class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition text-center">
                                         Xem trang cá nhân
                                     </a>
-                                {% else %}
-                                    <span class="w-full bg-gray-700 text-white py-2 rounded-lg text-center">
-                        Người dùng chưa tạo slug
-                    </span>
                                 {% endif %}
                             </div>
-
                         </div>
                     {% endfor %}
                 </div>
