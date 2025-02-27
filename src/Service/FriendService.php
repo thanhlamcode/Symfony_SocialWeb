@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\FriendList;
 use App\Repository\FriendListRepository;
+use App\Repository\ProfileRepository;
 use App\Service\User\UserService;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -14,11 +15,14 @@ class FriendService
 
     private UserService $userService;
 
-    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage, UserService $userService)
+    private ProfileRepository $profileRepository;
+
+    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage, UserService $userService, profileRepository $profileRepository)
     {
         $this->friendListRepository = $friendListRepository;
         $this->tokenStorage = $tokenStorage;
         $this->userService = $userService;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -151,31 +155,34 @@ class FriendService
             return [];
         }
 
+        // Lấy danh sách bạn bè từ friend_list
         $friendIds = $this->friendListRepository->findAcceptedFriends($user->getId());
 
-        dump($friendIds);
+        // Chuyển danh sách từ [['friendId' => 2], ['friendId' => 7]] thành [2, 7]
+        $friendIdArray = array_map(fn($item) => $item['friendId'], $friendIds);
+
+        // Lấy thông tin profile của tất cả bạn bè bằng 1 query duy nhất
+        $profiles = $this->profileRepository->findProfilesByUserIds($friendIdArray);
+
+        // Chuyển profile thành dạng [userId => profile]
+        $profileMap = [];
+        foreach ($profiles as $profile) {
+            $profileMap[$profile['userId']] = $profile;
+        }
 
         $friendList = [];
 
-        foreach ($friendIds as $friendData) {
-            if (!isset($friendData['friendId'])) {
-                continue;
-            }
+        // Duyệt qua danh sách bạn bè ban đầu để đảm bảo đủ số lượng
+        foreach ($friendIdArray as $friendId) {
+            $profile = $profileMap[$friendId] ?? null; // Kiểm tra nếu profile tồn tại
 
-            $friendId = $friendData['friendId'];
-            $friendInfo = $this->userService->getProfileBySlug($friendId); // Hoặc dùng findById($friendId)
-
-            if ($friendInfo) {
-                $friendList[] = [
-                    'id' => $friendInfo['userId'],
-                    'name' => $friendInfo['name'],
-                    'avatar' => $friendInfo['avatar'],
-                    'slug' => $friendInfo['slug'],
-                ];
-            }
+            $friendList[] = [
+                'id' => $friendId,
+                'name' => $profile['name'] ?? "Người dùng ẩn danh",
+                'avatar' => $profile['avatar'] ?? "https://default-avatar-url.com/avatar.jpg",
+                'slug' => $profile['slug'] ?? null,
+            ];
         }
-
-//        dump($friendList);
 
         return $friendList;
     }

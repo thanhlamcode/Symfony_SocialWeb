@@ -85,4 +85,14 @@ class ProfileRepository extends ServiceEntityRepository
             ->getOneOrNullResult(); // Luôn trả về một object Profile hoặc null
     }
 
+    public function findProfilesByUserIds(array $userIds): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.userId IN (:userIds)')
+            ->setParameter('userIds', $userIds)
+            ->getQuery()
+            ->getArrayResult(); // Trả về mảng thay vì object
+    }
+
+
 }
