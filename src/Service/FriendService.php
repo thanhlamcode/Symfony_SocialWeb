@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\FriendList;
 use App\Repository\FriendListRepository;
+use App\Service\User\UserService;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class FriendService
@@ -11,10 +12,13 @@ class FriendService
     private FriendListRepository $friendListRepository;
     private TokenStorageInterface $tokenStorage;
 
-    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage)
+    private UserService $userService;
+
+    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage, UserService $userService)
     {
         $this->friendListRepository = $friendListRepository;
         $this->tokenStorage = $tokenStorage;
+        $this->userService = $userService;
     }
 
     /**
@@ -137,5 +141,42 @@ class FriendService
 
         $this->friendListRepository->declineFriendRequest($senderId, $user->getId());
     }
+    /**
+     * Lấy danh sách bạn bè đã được chấp nhận
+     */
+    public function getAcceptedFriends(): array
+    {
+        $user = $this->userService->getCurrentUser();
+        if (!$user) {
+            return [];
+        }
 
+        $friendIds = $this->friendListRepository->findAcceptedFriends($user->getId());
+
+        dump($friendIds);
+
+        $friendList = [];
+
+        foreach ($friendIds as $friendData) {
+            if (!isset($friendData['friendId'])) {
+                continue;
+            }
+
+            $friendId = $friendData['friendId'];
+            $friendInfo = $this->userService->getProfileBySlug($friendId); // Hoặc dùng findById($friendId)
+
+            if ($friendInfo) {
+                $friendList[] = [
+                    'id' => $friendInfo['userId'],
+                    'name' => $friendInfo['name'],
+                    'avatar' => $friendInfo['avatar'],
+                    'slug' => $friendInfo['slug'],
+                ];
+            }
+        }
+
+//        dump($friendList);
+
+        return $friendList;
+    }
 }

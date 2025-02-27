@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\FriendService;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,9 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 class DashboardController extends AbstractController
 {
     private UserServiceInterface $userService;
+    private FriendService $friendService;
 
-    public function __construct(UserServiceInterface $userService){
+    public function __construct(UserServiceInterface $userService, FriendService $friendService){
         $this->userService = $userService;
+        $this->friendService = $friendService;
     }
 
     public function dashboard(): Response
@@ -19,6 +22,7 @@ class DashboardController extends AbstractController
 
         $profile = $this->userService->getCurrentUserProfile();
 
+        $friends = $this->friendService->getAcceptedFriends();
 
         $user = $this->getUser(); // Lấy thông tin user đang đăng nhập
 

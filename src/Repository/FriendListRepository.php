@@ -144,22 +144,6 @@ class FriendListRepository extends ServiceEntityRepository
         return true;
     }
 
-    public function getFriendRequests(): array
-    {
-        $currentUserId = $this->security->getUser()->getId();
-
-        return $this->entityManager->getRepository(FriendList::class)->createQueryBuilder('f')
-            ->select('u.id, u.name, u.slug, p.avatar')
-            ->leftJoin('App\Entity\User', 'u', 'WITH', 'u.id = f.senderId')
-            ->leftJoin('App\Entity\Profile', 'p', 'WITH', 'p.user_id = u.id')
-            ->where('f.receiverId = :currentUserId')
-            ->andWhere('f.status = :pending')
-            ->setParameter('currentUserId', $currentUserId)
-            ->setParameter('pending', 'pending')
-            ->getQuery()
-            ->getResult();
-    }
-
     /**
      * Chấp nhận lời mời kết bạn.
      */
@@ -195,5 +179,20 @@ class FriendListRepository extends ServiceEntityRepository
 
         $stmt = $conn->prepare($sql);
         $stmt->execute(['senderId' => $senderId, 'receiverId' => $receiverId]);
+    }
+
+    public function findAcceptedFriends(int $userId): array
+    {
+        return $this->createQueryBuilder('f')
+            ->select('CASE 
+                    WHEN f.senderId = :userId THEN f.receiverId 
+                    ELSE f.senderId 
+                  END AS friendId')
+            ->where('(f.senderId = :userId OR f.receiverId = :userId)')
+            ->andWhere('f.status = :status')
+            ->setParameter('userId', $userId)
+            ->setParameter('status', 'accepted')
+            ->getQuery()
+            ->getArrayResult(); // Đảm bảo kết quả là một mảng
     }
 }
