@@ -20,6 +20,10 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
+        $receiver = $this->userService->getUserProfileById($id);
+
+//        dump($receiver); exit();
+
         // Danh sách cuộc trò chuyện với tin nhắn
         $chatList = [
             [
@@ -81,7 +85,8 @@ class ChatController extends AbstractController
             'chat_list' => $chatList,  // Toàn bộ danh sách trò chuyện
             'current_chat' => $currentChat, // Cuộc trò chuyện đang hiển thị
             'user' => $user,
-            'profile' => $profile
+            'profile' => $profile,
+            'receiver' => $receiver
         ]);
     }
 }

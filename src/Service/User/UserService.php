@@ -64,6 +64,37 @@ class UserService implements UserServiceInterface
         ];
     }
 
+    public function getUserProfileById(int $userId): ?array
+    {
+        // Lấy User từ entityManager
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+
+        if (!$user) {
+            return null;
+        }
+
+        // Tìm Profile theo User ID
+        $profile = $this->profileRepository->findByUserId($user->getId());
+
+        // Ảnh mặc định
+        $defaultAvatar = "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg";
+
+        return [
+            'id' => $profile?->getId() ?? null,
+            'userId' => $user->getId(),
+            'name' => $profile?->getName() ?? $user->getEmail(),
+            'email' => $user->getEmail(),
+            'phone' => $profile?->getPhone() ?? null,
+            'avatar' => $profile?->getAvatar() ?? $defaultAvatar,
+            'bio' => $profile?->getBio() ?? null,
+            'interests' => $profile?->getInterests() ?? [],
+            'banner' => $profile?->getBanner() ?? null,
+            'socialAccounts' => $profile?->getSocialAccounts() ?? [],
+            'slug' => $profile?->getSlug() ?? null,
+            'job' => $profile?->getJob() ?? null,
+        ];
+    }
+
     public function updateCurrentUserProfile(array $data): bool
     {
         $user = $this->getCurrentUser();
