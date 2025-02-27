@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\MessageService;
 use App\Service\User\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,9 +11,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ChatController extends AbstractController
 {
     private UserService $userService;
+    private MessageService $messageService;
 
-    public function __construct(UserService $userService){
+    public function __construct(UserService $userService, MessageService $messageService){
         $this->userService = $userService;
+        $this->messageService = $messageService;
     }
 
     #[Route('/dashboard/message/{id}', name: 'chat_message')]
@@ -20,10 +23,26 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
+        // Lấy thông tin user hiện tại
+        $currentUser = $this->userService->getCurrentUser();
+        if (!$currentUser) {
+            throw $this->createNotFoundException("Bạn cần đăng nhập để xem tin nhắn.");
+        }
+
+        // Lấy thông tin người nhận
         $receiver = $this->userService->getUserProfileById($id);
+        if (!$receiver) {
+            throw $this->createNotFoundException("Người nhận không tồn tại.");
+        }
 
-//        dump($receiver); exit();
+        // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
+        $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
 
+
+        // Lấy danh sách cuộc trò chuyện gần đây
+        $chatList1 = $this->messageService->getRecentChats($currentUser->getId());
+
+        // Data mẫu
         // Danh sách cuộc trò chuyện với tin nhắn
         $chatList = [
             [

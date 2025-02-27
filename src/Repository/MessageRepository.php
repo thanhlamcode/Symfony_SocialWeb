@@ -24,10 +24,8 @@ class MessageRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('m')
             ->where('(m.senderId = :user1 AND m.receiverId = :user2)')
             ->orWhere('(m.senderId = :user2 AND m.receiverId = :user1)')
-            ->setParameters([
-                'user1' => $userId1,
-                'user2' => $userId2,
-            ])
+            ->setParameter('user1', $userId1)
+            ->setParameter('user2', $userId2)
             ->orderBy('m.sentAt', 'ASC') // Sắp xếp theo thời gian gửi
             ->getQuery()
             ->getResult();
@@ -62,5 +60,22 @@ class MessageRepository extends ServiceEntityRepository
             ])
             ->getQuery()
             ->execute();
+    }
+
+    public function findRecentChats(int $userId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->select('m') // Lấy toàn bộ thông tin tin nhắn
+            ->where('m.senderId = :userId OR m.receiverId = :userId')
+            ->setParameter('userId', $userId)
+            ->andWhere('m.sentAt = (
+            SELECT MAX(m2.sentAt) 
+            FROM App\Entity\Message m2
+            WHERE (m2.senderId = m.senderId AND m2.receiverId = m.receiverId) 
+               OR (m2.senderId = m.receiverId AND m2.receiverId = m.senderId)
+        )')
+            ->orderBy('m.sentAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

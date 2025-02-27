@@ -86,4 +86,26 @@ class MessageService
     {
         $this->messageRepository->markMessagesAsRead($receiverId);
     }
+
+    public function getRecentChats(int $userId): array
+    {
+        $messages = $this->messageRepository->findRecentChats($userId);
+
+        $chatList = [];
+        foreach ($messages as $message) {
+            $chatPartnerId = ($message->getSenderId() === $userId) ? $message->getReceiverId() : $message->getSenderId();
+            $chatPartner = $this->userRepository->find($chatPartnerId);
+
+            $chatList[] = [
+                'id' => $chatPartner?->getId(),
+                'name' => $chatPartner?->getEmail() ?? 'Ẩn danh',
+                'avatar' => '/images/avatar.png',
+                'last_message' => $message->getContent(),
+                'time' => $message->getSentAt()->format('H:i'),
+            ];
+        }
+
+        return $chatList;
+    }
+
 }
