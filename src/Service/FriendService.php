@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\FriendList;
+use App\Entity\User;
 use App\Repository\FriendListRepository;
 use App\Repository\ProfileRepository;
 use App\Service\User\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class FriendService
@@ -14,15 +16,18 @@ class FriendService
     private TokenStorageInterface $tokenStorage;
 
     private UserService $userService;
+    private EntityManagerInterface $entityManager;
+
 
     private ProfileRepository $profileRepository;
 
-    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage, UserService $userService, profileRepository $profileRepository)
+    public function __construct(FriendListRepository $friendListRepository, TokenStorageInterface $tokenStorage, UserService $userService, profileRepository $profileRepository, EntityManagerInterface $entityManager)
     {
         $this->friendListRepository = $friendListRepository;
         $this->tokenStorage = $tokenStorage;
         $this->userService = $userService;
         $this->profileRepository = $profileRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -164,6 +169,15 @@ class FriendService
         // Lấy thông tin profile của tất cả bạn bè bằng 1 query duy nhất
         $profiles = $this->profileRepository->findProfilesByUserIds($friendIdArray);
 
+        // Lấy danh sách userId để tìm thông tin email từ bảng User
+        $userEntities = $this->entityManager->getRepository(User::class)->findBy(['id' => $friendIdArray]);
+
+        // Chuyển User thành dạng [userId => email]
+        $userEmailMap = [];
+        foreach ($userEntities as $userEntity) {
+            $userEmailMap[$userEntity->getId()] = $userEntity->getEmail();
+        }
+
         // Chuyển profile thành dạng [userId => profile]
         $profileMap = [];
         foreach ($profiles as $profile) {
@@ -175,10 +189,11 @@ class FriendService
         // Duyệt qua danh sách bạn bè ban đầu để đảm bảo đủ số lượng
         foreach ($friendIdArray as $friendId) {
             $profile = $profileMap[$friendId] ?? null; // Kiểm tra nếu profile tồn tại
+            $email = $userEmailMap[$friendId]; // Lấy email từ User
 
             $friendList[] = [
                 'id' => $friendId,
-                'name' => $profile['name'] ?? "Người dùng ẩn danh",
+                'name' => $profile['name'] ?? $email, // Nếu không có name, dùng email
                 'avatar' => $profile['avatar'] ?? "https://default-avatar-url.com/avatar.jpg",
                 'slug' => $profile['slug'] ?? null,
             ];

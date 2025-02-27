@@ -26,6 +26,8 @@ class DashboardController extends AbstractController
 
         $user = $this->getUser(); // Lấy thông tin user đang đăng nhập
 
+//        dump($friends);
+
         // Danh sách chat (dữ liệu giả lập)
         $chatList = [
             [
