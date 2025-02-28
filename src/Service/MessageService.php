@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\MessageRepository;
+use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Message;
@@ -13,11 +14,15 @@ class MessageService
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(MessageRepository $messageRepository, UserRepository $userRepository, EntityManagerInterface $entityManager)
+    private ProfileRepository $profileRepository;
+
+    public function __construct(MessageRepository $messageRepository, UserRepository $userRepository,
+                                EntityManagerInterface $entityManager, ProfileRepository $profileRepository)
     {
         $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -103,11 +108,14 @@ class MessageService
                 continue; // Bỏ qua nếu không tìm thấy user
             }
 
+            // Tìm Profile của người bạn chat
+            $profile = $this->profileRepository->findOneBy(['userId' => $chatPartner->getId()]);
+
             $chatList[] = [
                 'id' => $chatPartner->getId(),
-                'name' => $chatPartner->getName() ?? $chatPartner->getEmail() ?? 'Ẩn danh', // Ưu tiên tên, nếu không có thì lấy email
-                'avatar' => $chatPartner->getAvatar() ?? 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg', // Avatar có sẵn hoặc default
-                'last_message' => $message->getContent() ?: 'Chưa có tin nhắn', // Nếu rỗng thì hiển thị mặc định
+                'name' => $profile?->getName() ?? $chatPartner->getEmail(), // Ưu tiên tên từ profile, nếu không có thì lấy email
+                'avatar' => $profile?->getAvatar() ?? 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg', // Lấy avatar từ profile nếu có
+                'last_message' => $message->getContent() ?: 'Chưa có tin nhắn',
                 'time' => $message->getSentAt() ? $message->getSentAt()->format('H:i') : '',
             ];
         }
