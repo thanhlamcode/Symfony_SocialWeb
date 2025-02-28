@@ -25,19 +25,21 @@ class DashboardController extends AbstractController
     {
 
         $profile = $this->userService->getCurrentUserProfile();
-        $friends = $this->friendService->getAcceptedFriends();
         $user = $this->getUser(); // Người dùng hiện tại
 
         if (!$user) {
             throw $this->createAccessDeniedException('Bạn chưa đăng nhập.');
         }
 
+        $friends = $this->messageService->getFriendsWithLastMessage($user);
+
+
         // Duyệt danh sách bạn bè và bổ sung last_message
-        foreach ($friends as &$friend) {
-            $lastMessage = $this->messageService->getLastMessage($user->getId(), $friend['id']);
-            $friend['last_message'] = $lastMessage ? $lastMessage['content'] : 'Chưa có tin nhắn';
-            $friend['last_message_time'] = $lastMessage ? $lastMessage['sentAt'] : null;
-        }
+//        foreach ($friends as &$friend) {
+//            $lastMessage = $this->messageService->getLastMessage($user->getId(), $friend['id']);
+//            $friend['last_message'] = $lastMessage ? $lastMessage['content'] : 'Chưa có tin nhắn';
+//            $friend['last_message_time'] = $lastMessage ? $lastMessage['sentAt'] : null;
+//        }
 
         // Danh sách chat (dữ liệu giả lập)
         $chatList = [

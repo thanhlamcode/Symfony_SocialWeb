@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\FriendService;
 use App\Service\MessageService;
 use App\Service\User\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,9 +14,12 @@ class ChatController extends AbstractController
     private UserService $userService;
     private MessageService $messageService;
 
-    public function __construct(UserService $userService, MessageService $messageService){
+    private FriendService $friendService;
+
+    public function __construct(UserService $userService, MessageService $messageService, FriendService $friendService){
         $this->userService = $userService;
         $this->messageService = $messageService;
+        $this->friendService = $friendService;
     }
 
     #[Route('/dashboard/message/{id}', name: 'chat_message')]
@@ -23,11 +27,15 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
+
+
         // Lấy thông tin user hiện tại
         $currentUser = $this->userService->getCurrentUser();
         if (!$currentUser) {
             throw $this->createNotFoundException("Bạn cần đăng nhập để xem tin nhắn.");
         }
+
+        $friends = $this->friendService->getAcceptedFriends();
 
         // Lấy thông tin người nhận
         $receiver = $this->userService->getUserProfileById($id);
@@ -107,7 +115,8 @@ class ChatController extends AbstractController
             'current_chat' => $currentChat, // Cuộc trò chuyện đang hiển thị
             'user' => $user,
             'profile' => $profile,
-            'receiver' => $receiver
+            'receiver' => $receiver,
+            'friends' => $friends,
         ]);
     }
 }

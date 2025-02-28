@@ -7,6 +7,7 @@ use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Message;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class MessageService
 {
@@ -16,13 +17,17 @@ class MessageService
 
     private ProfileRepository $profileRepository;
 
+    private FriendService $friendService;
+
     public function __construct(MessageRepository $messageRepository, UserRepository $userRepository,
-                                EntityManagerInterface $entityManager, ProfileRepository $profileRepository)
+                                EntityManagerInterface $entityManager, ProfileRepository $profileRepository
+    , FriendService $friendService)
     {
         $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
         $this->profileRepository = $profileRepository;
+        $this->friendService = $friendService;
     }
 
     /**
@@ -142,4 +147,19 @@ class MessageService
         ];
     }
 
+    /**
+     * Lấy danh sách bạn bè có kèm tin nhắn cuối cùng
+     */
+    public function getFriendsWithLastMessage(UserInterface $user): array
+    {
+        $friends = $this->friendService->getAcceptedFriends();
+
+        foreach ($friends as &$friend) {
+            $lastMessage = $this->getLastMessage($user->getId(), $friend['id']);
+            $friend['last_message'] = $lastMessage ? $lastMessage['content'] : 'Chưa có tin nhắn';
+            $friend['last_message_time'] = $lastMessage ? $lastMessage['sentAt'] : null;
+        }
+
+        return $friends;
+    }
 }
