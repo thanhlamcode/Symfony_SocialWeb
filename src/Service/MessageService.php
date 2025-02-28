@@ -37,9 +37,14 @@ class MessageService
     {
         $messages = $this->messageRepository->findMessagesBetweenUsers($userId1, $userId2);
 
+        if (empty($messages)) {
+            return []; // Trả về mảng rỗng nếu không có tin nhắn
+        }
+
         // Lấy thông tin người dùng
         $users = $this->userRepository->findBy(['id' => [$userId1, $userId2]]);
         $userMap = [];
+
         foreach ($users as $user) {
             $userMap[$user->getId()] = [
                 'email' => $user->getEmail(),

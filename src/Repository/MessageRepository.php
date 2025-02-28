@@ -26,7 +26,7 @@ class MessageRepository extends ServiceEntityRepository
             ->orWhere('(m.senderId = :user2 AND m.receiverId = :user1)')
             ->setParameter('user1', $userId1)
             ->setParameter('user2', $userId2)
-            ->orderBy('m.sentAt', 'ASC') // Sắp xếp theo thời gian gửi
+            ->orderBy('m.sentAt', 'ASC') // Lấy theo thời gian gửi tăng dần
             ->getQuery()
             ->getResult();
     }

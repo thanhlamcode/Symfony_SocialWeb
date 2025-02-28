@@ -27,8 +27,6 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
-
-
         // Lấy thông tin user hiện tại
         $currentUser = $this->userService->getCurrentUser();
         if (!$currentUser) {
@@ -49,20 +47,31 @@ class ChatController extends AbstractController
             throw $this->createNotFoundException("Người nhận không tồn tại.");
         }
 
-//        dump($receiver); exit();
-
         // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
         $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
 
+        dump($messages); exit();
 
         // Lấy danh sách cuộc trò chuyện gần đây
         $chatList1 = $this->messageService->getRecentChats($currentUser->getId());
+
 
         // Data mẫu
         // Danh sách cuộc trò chuyện với tin nhắn
         $chatList = [
             [
                 'id' => 1,
+                'name' => 'Nguyễn Văn A',
+                'avatar' => '/images/avatar1.png',
+                'last_message' => 'Bạn khỏe không?',
+                'time' => '10:30 AM',
+                'messages' => [
+                    ['sender' => 'Nguyễn Văn A', 'text' => 'Chào bạn!', 'time' => '10:25 AM'],
+                    ['sender' => 'Bạn', 'text' => 'Chào, bạn khỏe không?', 'time' => '10:27 AM'],
+                ]
+            ],
+            [
+                'id' => 4,
                 'name' => 'Nguyễn Văn A',
                 'avatar' => '/images/avatar1.png',
                 'last_message' => 'Bạn khỏe không?',
