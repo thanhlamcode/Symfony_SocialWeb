@@ -16,8 +16,6 @@ class MessageService
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
 
-    private ProfileRepository $profileRepository;
-
     private FriendService $friendService;
 
     private UserService $userService;
@@ -25,14 +23,12 @@ class MessageService
     public function __construct(MessageRepository $messageRepository,
                                 UserRepository $userRepository,
                                 EntityManagerInterface $entityManager,
-                                ProfileRepository $profileRepository,
                                 FriendService $friendService,
                                 UserService $userService)
     {
         $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
-        $this->profileRepository = $profileRepository;
         $this->friendService = $friendService;
         $this->userService = $userService;
     }
@@ -79,18 +75,17 @@ class MessageService
     /**
      * Gửi tin nhắn mới
      */
-    public function sendMessage(int $senderId, int $receiverId, string $content): Message
+    public function sendMessage(int $senderId, int $receiverId, string $content): void
     {
         $message = new Message();
         $message->setSenderId($senderId);
         $message->setReceiverId($receiverId);
         $message->setContent($content);
         $message->setSentAt(new \DateTime());
+        $message->setRead(false);
 
         $this->entityManager->persist($message);
         $this->entityManager->flush();
-
-        return $message;
     }
 
     /**
@@ -108,38 +103,6 @@ class MessageService
     {
         $this->messageRepository->markMessagesAsRead($receiverId);
     }
-
-    /**
-     * Lấy danh sách cuộc trò chuyện gần đây
-     */
-    public function getRecentChats(int $userId): array
-    {
-        $messages = $this->messageRepository->findRecentChats($userId);
-        $chatList = [];
-
-        foreach ($messages as $message) {
-            $chatPartnerId = ($message->getSenderId() === $userId) ? $message->getReceiverId() : $message->getSenderId();
-            $chatPartner = $this->userRepository->find($chatPartnerId);
-
-            if (!$chatPartner) {
-                continue; // Bỏ qua nếu không tìm thấy user
-            }
-
-            // Tìm Profile của người bạn chat
-            $profile = $this->profileRepository->findOneBy(['userId' => $chatPartner->getId()]);
-
-            $chatList[] = [
-                'id' => $chatPartner->getId(),
-                'name' => $profile?->getName() ?? $chatPartner->getEmail(), // Ưu tiên tên từ profile, nếu không có thì lấy email
-                'avatar' => $profile?->getAvatar() ?? 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg', // Lấy avatar từ profile nếu có
-                'last_message' => $message->getContent() ?: 'Chưa có tin nhắn',
-                'time' => $message->getSentAt() ? $message->getSentAt()->format('H:i') : '',
-            ];
-        }
-
-        return $chatList;
-    }
-
 
     public function getLastMessage(int $currentUserId, int $receiverId): ?array
     {
