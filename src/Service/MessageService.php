@@ -87,6 +87,9 @@ class MessageService
         $this->messageRepository->markMessagesAsRead($receiverId);
     }
 
+    /**
+     * Lấy danh sách cuộc trò chuyện gần đây
+     */
     public function getRecentChats(int $userId): array
     {
         $messages = $this->messageRepository->findRecentChats($userId);
@@ -106,6 +109,45 @@ class MessageService
         }
 
         return $chatList;
+    }
+
+    /**
+     * Lấy tin nhắn cuối cùng giữa hai người dùng
+     */
+    public function getLastMessageBetweenUsers(int $userId, int $receiverId): ?array
+    {
+        $message = $this->messageRepository->findLastMessageBetweenUsers($userId, $receiverId);
+
+        if (!$message) {
+            return null;
+        }
+
+        return [
+            'id' => $message->getId(),
+            'senderId' => $message->getSenderId(),
+            'receiverId' => $message->getReceiverId(),
+            'content' => $message->getContent(),
+            'sentAt' => $message->getSentAt()->format('Y-m-d H:i:s'),
+            'isRead' => $message->isRead(),
+        ];
+    }
+
+    public function getLastMessage(int $currentUserId, int $receiverId): ?array
+    {
+        $lastMessage = $this->messageRepository->findLastMessageBetweenUsers($currentUserId, $receiverId);
+
+        if (!$lastMessage) {
+            return null;
+        }
+
+        return [
+            'id' => $lastMessage->getId(),
+            'senderId' => $lastMessage->getSenderId(),
+            'receiverId' => $lastMessage->getReceiverId(),
+            'content' => $lastMessage->getContent(),
+            'sentAt' => $lastMessage->getSentAt()->format('Y-m-d H:i:s'),
+            'isRead' => $lastMessage->isRead(),
+        ];
     }
 
 }

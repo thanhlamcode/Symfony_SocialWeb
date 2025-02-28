@@ -78,4 +78,20 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Lấy tin nhắn cuối cùng giữa hai người dùng
+     */
+    public function findLastMessageBetweenUsers(int $userId1, int $userId2): ?Message
+    {
+        return $this->createQueryBuilder('m')
+            ->where('(m.senderId = :user1 AND m.receiverId = :user2)')
+            ->orWhere('(m.senderId = :user2 AND m.receiverId = :user1)')
+            ->setParameter('user1', $userId1)
+            ->setParameter('user2', $userId2)
+            ->orderBy('m.sentAt', 'DESC') // Lấy tin nhắn mới nhất
+            ->setMaxResults(1) // Chỉ lấy 1 tin nhắn cuối cùng
+            ->getQuery()
+            ->getOneOrNullResult(); // Trả về 1 kết quả hoặc null nếu không có tin nhắn
+    }
 }

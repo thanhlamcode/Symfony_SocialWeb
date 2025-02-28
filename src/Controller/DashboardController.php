@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\FriendService;
+use App\Service\MessageService;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,21 +13,36 @@ class DashboardController extends AbstractController
     private UserServiceInterface $userService;
     private FriendService $friendService;
 
-    public function __construct(UserServiceInterface $userService, FriendService $friendService){
+    private MessageService $messageService;
+
+    public function __construct(UserServiceInterface $userService, FriendService $friendService, MessageService $messageService){
         $this->userService = $userService;
         $this->friendService = $friendService;
+        $this->messageService = $messageService;
     }
 
     public function dashboard(): Response
     {
 
         $profile = $this->userService->getCurrentUserProfile();
-
         $friends = $this->friendService->getAcceptedFriends();
+        $user = $this->getUser(); // Người dùng hiện tại
 
-        $user = $this->getUser(); // Lấy thông tin user đang đăng nhập
+        if (!$user) {
+            throw $this->createAccessDeniedException('Bạn chưa đăng nhập.');
+        }
 
-//        dump($friends);
+        // Duyệt danh sách bạn bè và bổ sung last_message
+        foreach ($friends as &$friend) {
+            $lastMessage = $this->messageService->getLastMessage($user->getId(), $friend['id']);
+            $friend['last_message'] = $lastMessage ? $lastMessage['content'] : 'Chưa có tin nhắn';
+            $friend['last_message_time'] = $lastMessage ? $lastMessage['sentAt'] : null;
+        }
+
+        dump($user);
+        // Kiểm tra kết quả
+        dump($friends); exit();
+
 
         // Danh sách chat (dữ liệu giả lập)
         $chatList = [
