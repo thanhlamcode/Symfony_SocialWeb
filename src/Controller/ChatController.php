@@ -35,7 +35,13 @@ class ChatController extends AbstractController
             throw $this->createNotFoundException("Bạn cần đăng nhập để xem tin nhắn.");
         }
 
-        $friends = $this->friendService->getAcceptedFriends();
+        $user = $this->getUser(); // Người dùng hiện tại
+
+        if (!$user) {
+            throw $this->createAccessDeniedException('Bạn chưa đăng nhập.');
+        }
+
+        $friends = $this->messageService->getFriendsWithLastMessage($user);
 
         // Lấy thông tin người nhận
         $receiver = $this->userService->getUserProfileById($id);
@@ -79,6 +85,17 @@ class ChatController extends AbstractController
             ],
             [
                 'id' => 3,
+                'name' => 'Lê Minh C',
+                'avatar' => '/images/avatar3.png',
+                'last_message' => 'Haha, đúng rồi đó!',
+                'time' => 'Hôm qua',
+                'messages' => [
+                    ['sender' => 'Bạn', 'text' => 'Hôm qua vui quá!', 'time' => 'Hôm qua'],
+                    ['sender' => 'Lê Minh C', 'text' => 'Haha, đúng rồi đó!', 'time' => 'Hôm qua'],
+                ]
+            ],
+            [
+                'id' => 7,
                 'name' => 'Lê Minh C',
                 'avatar' => '/images/avatar3.png',
                 'last_message' => 'Haha, đúng rồi đó!',
