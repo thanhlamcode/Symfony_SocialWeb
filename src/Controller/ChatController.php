@@ -27,8 +27,6 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
-
-
         // Lấy thông tin user hiện tại
         $currentUser = $this->userService->getCurrentUser();
         if (!$currentUser) {
@@ -132,6 +130,11 @@ class ChatController extends AbstractController
             'name' => 'Bạn',
             'avatar' => $profile['avatar'],
         ];
+//
+//        dump($user);
+//        dump($receiver);
+//        dump($messages); exit();
+
 
         return $this->render('message.html.twig', [
             'chat_list' => $chatList,  // Toàn bộ danh sách trò chuyện

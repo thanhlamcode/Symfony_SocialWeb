@@ -11,28 +11,26 @@
 
         <div class="flex-1 overflow-y-auto space-y-6 p-4">
             {% for message in current_chat.messages %}
-                {% if message.sender == user.name %}
+                {% if message.senderId == user.id %}
                     {# Tin nhắn của user (bên phải) #}
                     <div class="flex items-start space-x-3 justify-end">
                         <div class="bg-blue-500 p-3 rounded-lg max-w-md">
                             <p class="text-sm font-bold">{{ user.name }}</p>
-                            <p class="mt-1">{{ message.text }}</p>
+                            <p class="mt-1">{{ message.content }}</p>
                             <div class="flex space-x-2 text-gray-300 text-xs mt-1">
-                                <span>👀 3</span>
                                 <span>{{ message.time }}</span>
                             </div>
                         </div>
                         <img src="{{ user.avatar }}" class="w-10 h-10 rounded-full">
                     </div>
                 {% else %}
-                    {# Tin nhắn của người khác (bên trái) #}
+                    {# Tin nhắn của người nhận (bên trái) #}
                     <div class="flex items-start space-x-3">
-                        <img src="{{ current_chat.avatar }}" class="w-10 h-10 rounded-full">
+                        <img src="{{ receiver.avatar }}" class="w-10 h-10 rounded-full">
                         <div class="bg-gray-700 p-3 rounded-lg max-w-md">
-                            <p class="text-sm font-bold">{{ message.sender }}</p>
-                            <p class="mt-1">{{ message.text }}</p>
+                            <p class="text-sm font-bold">{{ receiver.name }}</p>
+                            <p class="mt-1">{{ message.content }}</p>
                             <div class="flex space-x-2 text-gray-400 text-xs mt-1">
-                                <span>👀 3</span>
                                 <span>{{ message.time }}</span>
                             </div>
                         </div>
