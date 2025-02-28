@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repository\MessageRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\UserRepository;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Message;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,15 +20,21 @@ class MessageService
 
     private FriendService $friendService;
 
-    public function __construct(MessageRepository $messageRepository, UserRepository $userRepository,
-                                EntityManagerInterface $entityManager, ProfileRepository $profileRepository
-    , FriendService $friendService)
+    private UserService $userService;
+
+    public function __construct(MessageRepository $messageRepository,
+                                UserRepository $userRepository,
+                                EntityManagerInterface $entityManager,
+                                ProfileRepository $profileRepository,
+                                FriendService $friendService,
+                                UserService $userService)
     {
         $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
         $this->profileRepository = $profileRepository;
         $this->friendService = $friendService;
+        $this->userService = $userService;
     }
 
     /**
@@ -166,5 +173,55 @@ class MessageService
         }
 
         return $friends;
+    }
+
+    /**
+     * Lấy toàn bộ dữ liệu cần thiết để hiển thị trang tin nhắn
+     */
+    public function getChatData(int $receiverId, UserInterface $currentUser): array
+    {
+        // Lấy profile user hiện tại
+        $profile = $this->userService->getCurrentUserProfile();
+
+        // Lấy danh sách bạn bè kèm tin nhắn cuối
+        $friends = $this->getFriendsWithLastMessage($currentUser);
+
+        // Lấy thông tin người nhận
+        $receiver = $this->userService->getUserProfileById($receiverId);
+        if (!$receiver) {
+            throw new \Exception("Người nhận không tồn tại.");
+        }
+
+        // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
+        $messages = $this->getChatHistory($currentUser->getId(), $receiverId);
+
+        // Cấu trúc dữ liệu của `currentChat`
+        $currentChat = [
+            'id' => $receiver['id'],
+            'name' => $receiver['name'],
+            'avatar' => $receiver['avatar'],
+            'messages' => array_map(function ($message) {
+                return [
+                    'senderId' => $message['senderId'],
+                    'text' => $message['content'],
+                    'time' => (new \DateTime($message['sentAt']))->format('H:i'),
+                ];
+            }, $messages),
+        ];
+
+        // Dữ liệu user
+        $userData = [
+            'id' => $currentUser->getId(),
+            'name' => 'Bạn',
+            'avatar' => $profile['avatar'],
+        ];
+
+        return [
+            'profile' => $profile,
+            'user' => $userData,
+            'receiver' => $receiver,
+            'friends' => $friends,
+            'current_chat' => $currentChat,
+        ];
     }
 }

@@ -11,78 +11,25 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ChatController extends AbstractController
 {
-    private UserService $userService;
     private MessageService $messageService;
 
-    private FriendService $friendService;
-
-    public function __construct(UserService $userService, MessageService $messageService, FriendService $friendService){
-        $this->userService = $userService;
+    public function __construct(MessageService $messageService){
         $this->messageService = $messageService;
-        $this->friendService = $friendService;
     }
 
     #[Route('/dashboard/message/{id}', name: 'chat_message')]
     public function message(int $id): Response
     {
-        $profile = $this->userService->getCurrentUserProfile();
-
-        // Lấy thông tin user hiện tại
-        $currentUser = $this->userService->getCurrentUser();
+        // Lấy user hiện tại
+        $currentUser = $this->getUser();
         if (!$currentUser) {
-            throw $this->createNotFoundException("Bạn cần đăng nhập để xem tin nhắn.");
+            throw $this->createAccessDeniedException("Bạn chưa đăng nhập.");
         }
 
-        $user = $this->getUser(); // Người dùng hiện tại
-        if (!$user) {
-            throw $this->createAccessDeniedException('Bạn chưa đăng nhập.');
-        }
+        // Gọi Service để lấy dữ liệu chat
+        $chatData = $this->messageService->getChatData($id, $currentUser);
 
-        // Lấy danh sách bạn bè và tin nhắn cuối cùng
-        $friends = $this->messageService->getFriendsWithLastMessage($user);
-
-        // Lấy thông tin người nhận
-        $receiver = $this->userService->getUserProfileById($id);
-        if (!$receiver) {
-            throw $this->createNotFoundException("Người nhận không tồn tại.");
-        }
-
-        // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
-        $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
-
-        // Cấu trúc dữ liệu của `currentChat` để truyền vào giao diện
-        $currentChat = [
-            'id' => $receiver['id'],
-            'name' => $receiver['name'],
-            'avatar' => $receiver['avatar'],
-            'messages' => []
-        ];
-
-        // Xử lý danh sách tin nhắn
-        foreach ($messages as $message) {
-            $currentChat['messages'][] = [
-                'senderId' => $message['senderId'],
-                'text' => $message['content'],
-                'time' => (new \DateTime($message['sentAt']))->format('H:i'),
-            ];
-        }
-
-        // Truyền dữ liệu user chính xác
-        $userData = [
-            'id' => $currentUser->getId(),
-            'name' => 'Bạn',
-            'avatar' => $profile['avatar'],
-        ];
-
-        return $this->render('message.html.twig', [
-            'chat_list' => $friends, // Danh sách cuộc trò chuyện
-            'current_chat' => $currentChat, // Cuộc trò chuyện hiện tại
-            'user' => $userData,
-            'profile' => $profile,
-            'receiver' => $receiver,
-            'friends' => $friends,
-            'messages' => $messages, // ✅ Sửa lỗi key '$messages'
-        ]);
+        return $this->render('message.html.twig', $chatData);
     }
 
 }
