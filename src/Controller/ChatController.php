@@ -27,6 +27,8 @@ class ChatController extends AbstractController
     {
         $profile = $this->userService->getCurrentUserProfile();
 
+
+
         // Lấy thông tin user hiện tại
         $currentUser = $this->userService->getCurrentUser();
         if (!$currentUser) {
@@ -49,11 +51,6 @@ class ChatController extends AbstractController
 
         // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
         $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
-
-        dump($messages); exit();
-
-        // Lấy danh sách cuộc trò chuyện gần đây
-        $chatList1 = $this->messageService->getRecentChats($currentUser->getId());
 
 
         // Data mẫu
@@ -130,10 +127,10 @@ class ChatController extends AbstractController
             throw $this->createNotFoundException("Cuộc trò chuyện không tồn tại.");
         }
 
-        // Giả lập user đăng nhập
+        // User đăng nhập
         $user = [
             'name' => 'Bạn',
-            'avatar' => '/images/user.png'
+            'avatar' => $profile['avatar'],
         ];
 
         return $this->render('message.html.twig', [
@@ -143,6 +140,7 @@ class ChatController extends AbstractController
             'profile' => $profile,
             'receiver' => $receiver,
             'friends' => $friends,
+            '$messages' => $messages
         ]);
     }
 }
