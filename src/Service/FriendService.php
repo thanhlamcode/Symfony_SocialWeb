@@ -194,7 +194,7 @@ class FriendService
             $friendList[] = [
                 'id' => $friendId,
                 'name' => $profile['name'] ?? $email, // Nếu không có name, dùng email
-                'avatar' => $profile['avatar'] ?? "https://default-avatar-url.com/avatar.jpg",
+                'avatar' => $profile['avatar'] ?? "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg",
                 'slug' => $profile['slug'] ?? null,
             ];
         }

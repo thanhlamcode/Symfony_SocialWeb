@@ -93,44 +93,28 @@ class MessageService
     public function getRecentChats(int $userId): array
     {
         $messages = $this->messageRepository->findRecentChats($userId);
-
         $chatList = [];
+
         foreach ($messages as $message) {
             $chatPartnerId = ($message->getSenderId() === $userId) ? $message->getReceiverId() : $message->getSenderId();
             $chatPartner = $this->userRepository->find($chatPartnerId);
 
+            if (!$chatPartner) {
+                continue; // Bỏ qua nếu không tìm thấy user
+            }
+
             $chatList[] = [
-                'id' => $chatPartner?->getId(),
-                'name' => $chatPartner?->getEmail() ?? 'Ẩn danh',
-                'avatar' => '/images/avatar.png',
-                'last_message' => $message->getContent(),
-                'time' => $message->getSentAt()->format('H:i'),
+                'id' => $chatPartner->getId(),
+                'name' => $chatPartner->getName() ?? $chatPartner->getEmail() ?? 'Ẩn danh', // Ưu tiên tên, nếu không có thì lấy email
+                'avatar' => $chatPartner->getAvatar() ?? 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg', // Avatar có sẵn hoặc default
+                'last_message' => $message->getContent() ?: 'Chưa có tin nhắn', // Nếu rỗng thì hiển thị mặc định
+                'time' => $message->getSentAt() ? $message->getSentAt()->format('H:i') : '',
             ];
         }
 
         return $chatList;
     }
 
-    /**
-     * Lấy tin nhắn cuối cùng giữa hai người dùng
-     */
-    public function getLastMessageBetweenUsers(int $userId, int $receiverId): ?array
-    {
-        $message = $this->messageRepository->findLastMessageBetweenUsers($userId, $receiverId);
-
-        if (!$message) {
-            return null;
-        }
-
-        return [
-            'id' => $message->getId(),
-            'senderId' => $message->getSenderId(),
-            'receiverId' => $message->getReceiverId(),
-            'content' => $message->getContent(),
-            'sentAt' => $message->getSentAt()->format('Y-m-d H:i:s'),
-            'isRead' => $message->isRead(),
-        ];
-    }
 
     public function getLastMessage(int $currentUserId, int $receiverId): ?array
     {

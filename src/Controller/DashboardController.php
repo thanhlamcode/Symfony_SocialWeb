@@ -39,11 +39,6 @@ class DashboardController extends AbstractController
             $friend['last_message_time'] = $lastMessage ? $lastMessage['sentAt'] : null;
         }
 
-        dump($user);
-        // Kiểm tra kết quả
-        dump($friends); exit();
-
-
         // Danh sách chat (dữ liệu giả lập)
         $chatList = [
             [
@@ -88,7 +83,8 @@ class DashboardController extends AbstractController
             'chat_list' => $chatList,
             'current_chat' => $currentChat,
             'messages' => $messages,
-            'profile' => $profile
+            'profile' => $profile,
+            'friends' => $friends,
         ]);
     }
 }
