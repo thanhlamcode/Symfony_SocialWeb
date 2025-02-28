@@ -49,4 +49,70 @@
             </form>
         </div>
     </div>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+        // Kết nối đến server WebSocket
+        const socket = io('http://localhost:3000');
+
+        // Gửi tin nhắn khi form được submit
+        const form = document.querySelector('form');
+        const inputMessage = document.querySelector('input[name="message"]');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = inputMessage.value;
+
+            // Gửi tin nhắn qua WebSocket
+            socket.emit('send_message', {
+                senderId: {{ user.id }},
+                receiverId: {{ receiver.userId }},
+                text: message,
+                time: new Date().toLocaleTimeString(),
+                userName: '{{ user.name }}',
+                receiverName: '{{ receiver.name }}',
+                userAvatar: '{{ user.avatar }}',
+                receiverAvatar: '{{ receiver.avatar }}'
+            });
+
+            // Xóa nội dung input
+            inputMessage.value = '';
+        });
+
+        // Lắng nghe sự kiện nhận tin nhắn từ server và hiển thị tin nhắn mới
+        socket.on('receive_message', (message) => {
+            const messagesContainer = document.querySelector('.flex-1');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'items-start', 'space-x-3');
+
+            // Hiển thị tin nhắn gửi từ người dùng hiện tại hoặc người nhận
+            if (message.senderId === {{ user.id }}) {
+                messageElement.classList.add('justify-end');
+                messageElement.innerHTML = `
+                <div class="bg-blue-500 p-3 rounded-lg max-w-md">
+                    <p class="text-sm font-bold">${message.userName}</p>
+                    <p class="mt-1">${message.text}</p>
+                    <div class="flex space-x-2 text-gray-300 text-xs mt-1">
+                        <span>${message.time}</span>
+                    </div>
+                </div>
+                <img src="${message.userAvatar}" class="w-10 h-10 rounded-full">
+            `;
+            } else {
+                messageElement.innerHTML = `
+                <img src="${message.receiverAvatar}" class="w-10 h-10 rounded-full">
+                <div class="bg-gray-700 p-3 rounded-lg max-w-md">
+                    <p class="text-sm font-bold">${message.receiverName}</p>
+                    <p class="mt-1">${message.text}</p>
+                    <div class="flex space-x-2 text-gray-400 text-xs mt-1">
+                        <span>${message.time}</span>
+                    </div>
+                </div>
+            `;
+            }
+
+            // Thêm tin nhắn vào container
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;  // Cuộn xuống dưới cùng khi có tin nhắn mới
+        });
+    </script>
 {% endblock %}
