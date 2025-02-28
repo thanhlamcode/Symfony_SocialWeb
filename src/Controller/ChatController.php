@@ -35,6 +35,8 @@ class ChatController extends AbstractController
             throw $this->createNotFoundException("Người nhận không tồn tại.");
         }
 
+//        dump($receiver); exit();
+
         // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
         $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
 
