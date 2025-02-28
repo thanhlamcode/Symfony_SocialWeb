@@ -34,11 +34,11 @@ class ChatController extends AbstractController
         }
 
         $user = $this->getUser(); // Người dùng hiện tại
-
         if (!$user) {
             throw $this->createAccessDeniedException('Bạn chưa đăng nhập.');
         }
 
+        // Lấy danh sách bạn bè và tin nhắn cuối cùng
         $friends = $this->messageService->getFriendsWithLastMessage($user);
 
         // Lấy thông tin người nhận
@@ -50,100 +50,39 @@ class ChatController extends AbstractController
         // Lấy danh sách tin nhắn giữa user hiện tại và người nhận
         $messages = $this->messageService->getChatHistory($currentUser->getId(), $id);
 
-
-        // Data mẫu
-        // Danh sách cuộc trò chuyện với tin nhắn
-        $chatList = [
-            [
-                'id' => 1,
-                'name' => 'Nguyễn Văn A',
-                'avatar' => '/images/avatar1.png',
-                'last_message' => 'Bạn khỏe không?',
-                'time' => '10:30 AM',
-                'messages' => [
-                    ['sender' => 'Nguyễn Văn A', 'text' => 'Chào bạn!', 'time' => '10:25 AM'],
-                    ['sender' => 'Bạn', 'text' => 'Chào, bạn khỏe không?', 'time' => '10:27 AM'],
-                ]
-            ],
-            [
-                'id' => 4,
-                'name' => 'Nguyễn Văn A',
-                'avatar' => '/images/avatar1.png',
-                'last_message' => 'Bạn khỏe không?',
-                'time' => '10:30 AM',
-                'messages' => [
-                    ['sender' => 'Nguyễn Văn A', 'text' => 'Chào bạn!', 'time' => '10:25 AM'],
-                    ['sender' => 'Bạn', 'text' => 'Chào, bạn khỏe không?', 'time' => '10:27 AM'],
-                ]
-            ],
-            [
-                'id' => 2,
-                'name' => 'Trần Thị B',
-                'avatar' => '/images/avatar2.png',
-                'last_message' => 'Mai gặp nhau nhé!',
-                'time' => '09:15 AM',
-                'messages' => [
-                    ['sender' => 'Trần Thị B', 'text' => 'Mai có rảnh không?', 'time' => '09:10 AM'],
-                    ['sender' => 'Bạn', 'text' => 'Ừ, mai gặp nhé!', 'time' => '09:12 AM'],
-                ]
-            ],
-            [
-                'id' => 3,
-                'name' => 'Lê Minh C',
-                'avatar' => '/images/avatar3.png',
-                'last_message' => 'Haha, đúng rồi đó!',
-                'time' => 'Hôm qua',
-                'messages' => [
-                    ['sender' => 'Bạn', 'text' => 'Hôm qua vui quá!', 'time' => 'Hôm qua'],
-                    ['sender' => 'Lê Minh C', 'text' => 'Haha, đúng rồi đó!', 'time' => 'Hôm qua'],
-                ]
-            ],
-            [
-                'id' => 7,
-                'name' => 'Lê Minh C',
-                'avatar' => '/images/avatar3.png',
-                'last_message' => 'Haha, đúng rồi đó!',
-                'time' => 'Hôm qua',
-                'messages' => [
-                    ['sender' => 'Bạn', 'text' => 'Hôm qua vui quá!', 'time' => 'Hôm qua'],
-                    ['sender' => 'Lê Minh C', 'text' => 'Haha, đúng rồi đó!', 'time' => 'Hôm qua'],
-                ]
-            ]
+        // Cấu trúc dữ liệu của `currentChat` để truyền vào giao diện
+        $currentChat = [
+            'id' => $receiver['id'],
+            'name' => $receiver['name'],
+            'avatar' => $receiver['avatar'],
+            'messages' => []
         ];
 
-        // Tìm cuộc trò chuyện hiện tại dựa trên ID
-        $currentChat = null;
-        foreach ($chatList as $chat) {
-            if ($chat['id'] === $id) {
-                $currentChat = $chat;
-                break;
-            }
+        // Xử lý danh sách tin nhắn
+        foreach ($messages as $message) {
+            $currentChat['messages'][] = [
+                'senderId' => $message['senderId'],
+                'text' => $message['content'],
+                'time' => (new \DateTime($message['sentAt']))->format('H:i'),
+            ];
         }
 
-        // Nếu không tìm thấy, trả về lỗi 404
-        if ($currentChat === null) {
-            throw $this->createNotFoundException("Cuộc trò chuyện không tồn tại.");
-        }
-
-        // User đăng nhập
-        $user = [
+        // Truyền dữ liệu user chính xác
+        $userData = [
+            'id' => $currentUser->getId(),
             'name' => 'Bạn',
             'avatar' => $profile['avatar'],
         ];
-//
-//        dump($user);
-//        dump($receiver);
-//        dump($messages); exit();
-
 
         return $this->render('message.html.twig', [
-            'chat_list' => $chatList,  // Toàn bộ danh sách trò chuyện
-            'current_chat' => $currentChat, // Cuộc trò chuyện đang hiển thị
-            'user' => $user,
+            'chat_list' => $friends, // Danh sách cuộc trò chuyện
+            'current_chat' => $currentChat, // Cuộc trò chuyện hiện tại
+            'user' => $userData,
             'profile' => $profile,
             'receiver' => $receiver,
             'friends' => $friends,
-            '$messages' => $messages
+            'messages' => $messages, // ✅ Sửa lỗi key '$messages'
         ]);
     }
+
 }

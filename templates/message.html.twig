@@ -16,7 +16,7 @@
                     <div class="flex items-start space-x-3 justify-end">
                         <div class="bg-blue-500 p-3 rounded-lg max-w-md">
                             <p class="text-sm font-bold">{{ user.name }}</p>
-                            <p class="mt-1">{{ message.content }}</p>
+                            <p class="mt-1">{{ message.text }}</p>
                             <div class="flex space-x-2 text-gray-300 text-xs mt-1">
                                 <span>{{ message.time }}</span>
                             </div>
@@ -29,7 +29,7 @@
                         <img src="{{ receiver.avatar }}" class="w-10 h-10 rounded-full">
                         <div class="bg-gray-700 p-3 rounded-lg max-w-md">
                             <p class="text-sm font-bold">{{ receiver.name }}</p>
-                            <p class="mt-1">{{ message.content }}</p>
+                            <p class="mt-1">{{ message.text }}</p>
                             <div class="flex space-x-2 text-gray-400 text-xs mt-1">
                                 <span>{{ message.time }}</span>
                             </div>
