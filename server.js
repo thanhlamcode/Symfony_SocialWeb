@@ -18,69 +18,50 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
     console.log(`🔵 User connected: ${socket.id}`);
 
-    // 🟢 ✅ ĐĂNG KÝ NGƯỜI DÙNG (Chat & Call)
-    socket.on("register_user", (userId) => {
-        users[userId] = socket.id;
-        console.log(`✅ Registered user: ${userId} -> ${socket.id}`);
-    });
-
     // 🟢 ✅ XỬ LÝ CHAT
     socket.on("send_message", (message) => {
         console.log("💬 Message received:", message);
         io.emit("receive_message", message); // Phát lại tin nhắn cho tất cả người dùng
     });
 
-    // 🟢 ✅ BẮT ĐẦU CUỘC GỌI
-    socket.on("start_call", ({ senderId, receiverId }) => {
-        console.log(`📞 Start call from ${senderId} to ${receiverId}`);
+    socket.on("register_user", (userId) => {
+        users[userId] = socket.id;
+        console.log(`✅ Registered user: ${userId} -> ${socket.id}`);
+    });
 
+    socket.on("start_call", ({ senderId, receiverId, senderName }) => {
         if (users[receiverId]) {
-            console.log(`📢 Gửi incoming_call đến ${receiverId} (socketId: ${users[receiverId]})`);
-            io.to(users[receiverId]).emit("incoming_call", { senderId });
-        } else {
-            console.log(`⚠️ User ${receiverId} không online.`);
+            io.to(users[receiverId]).emit("incoming_call", { senderId, senderName });
         }
     });
 
-    // 🟢 ✅ GỬI OFFER (WebRTC SDP)
     socket.on("offer", ({ offer, senderId, receiverId }) => {
         if (users[receiverId]) {
-            console.log(`📡 Gửi offer từ ${senderId} đến ${receiverId}`);
             io.to(users[receiverId]).emit("offer", { offer, senderId });
         }
     });
 
-    // 🟢 ✅ GỬI ANSWER (WebRTC SDP)
     socket.on("answer", ({ answer, receiverId }) => {
         if (users[receiverId]) {
-            console.log(`✅ Gửi answer đến ${receiverId}`);
             io.to(users[receiverId]).emit("answer", { answer });
         }
     });
 
-    // 🟢 ✅ GỬI ICE CANDIDATE (WebRTC)
     socket.on("ice_candidate", ({ candidate, receiverId }) => {
         if (users[receiverId]) {
-            console.log(`❄ Gửi ICE Candidate đến ${receiverId}`);
             io.to(users[receiverId]).emit("ice_candidate", { candidate });
         }
     });
 
-    // 🟢 ✅ KẾT THÚC CUỘC GỌI
     socket.on("end_call", ({ senderId, receiverId }) => {
         if (users[receiverId]) {
-            console.log(`🚫 Cuộc gọi kết thúc từ ${senderId}`);
-            io.to(users[receiverId]).emit("call_ended", { senderId });
+            io.to(users[receiverId]).emit("call_ended");
         }
     });
 
-    // 🛑 ✅ XÓA USER KHI NGẮT KẾT NỐI
     socket.on("disconnect", () => {
-        console.log(`🔴 User disconnected: ${socket.id}`);
-
         for (let userId in users) {
             if (users[userId] === socket.id) {
-                console.log(`🗑 Xóa user ${userId} khỏi danh sách.`);
                 delete users[userId];
                 break;
             }

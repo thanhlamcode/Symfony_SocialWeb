@@ -6,27 +6,31 @@
     <title>Video Call</title>
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 </head>
-<body style="background: black; color: white; text-align: center;">
-<h2>Đang gọi...</h2>
-<video id="localVideo" autoplay style="width: 400px; height: 300px; background: gray;"></video>
-<video id="remoteVideo" autoplay style="width: 400px; height: 300px; background: gray;"></video>
-<button id="endCallBtn" style="background: red; color: white; padding: 10px; margin-top: 20px;">Kết thúc</button>
+<body>
+<h2>Video Call</h2>
+<video id="localVideo" autoplay playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+<button id="endCallBtn">End Call</button>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const senderId = urlParams.get('senderId');
-    const receiverId = urlParams.get('receiverId');
     const socket = io('{{ websocket_url }}');
+    const urlParams = new URLSearchParams(window.location.search);
+    const senderId = urlParams.get("senderId");
+    const receiverId = urlParams.get("receiverId");
 
     let peerConnection;
     const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
+    socket.on("connect", () => {
+        console.log(`✅ Connected to WebSocket as user: ${senderId}`);
+        socket.emit("register_user", senderId);
+    });
+
     async function startCall() {
-        console.log("📞 Bắt đầu cuộc gọi...");
         peerConnection = new RTCPeerConnection(config);
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
         document.getElementById("localVideo").srcObject = stream;
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
 
         peerConnection.ontrack = (event) => {
             document.getElementById("remoteVideo").srcObject = event.streams[0];
@@ -40,28 +44,12 @@
 
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
-        socket.emit("offer", { offer, receiverId });
+        socket.emit("offer", { offer, senderId, receiverId });
     }
 
     socket.on("offer", async ({ offer, senderId }) => {
-        console.log("📡 Nhận offer từ", senderId);
-        peerConnection = new RTCPeerConnection(config);
-        peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-        document.getElementById("localVideo").srcObject = stream;
-
-        peerConnection.ontrack = (event) => {
-            document.getElementById("remoteVideo").srcObject = event.streams[0];
-        };
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit("ice_candidate", { candidate: event.candidate, receiverId: senderId });
-            }
-        };
-
+        if (!peerConnection) startCall();
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
         socket.emit("answer", { answer, receiverId: senderId });
@@ -77,6 +65,11 @@
 
     document.getElementById("endCallBtn").addEventListener("click", () => {
         socket.emit("end_call", { senderId, receiverId });
+        peerConnection.close();
+        window.close();
+    });
+
+    socket.on("call_ended", () => {
         peerConnection.close();
         window.close();
     });

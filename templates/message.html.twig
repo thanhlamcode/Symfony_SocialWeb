@@ -178,55 +178,32 @@
         // Gọi hàm khi trang tải xong
         window.onload = scrollToBottom;
     </script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const videoCallBtn = document.getElementById("videoCallBtn");
+        let peerConnection;
+        const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-            // Đăng ký user khi kết nối WebSocket
-            socket.on("connect", () => {
-                console.log(`✅ Connected to WebSocket as user: {{ user.id }}`);
-                socket.emit("register_user", {{ user.id }});
-            });
+        // Đăng ký user với WebSocket
+        socket.on("connect", () => {
+            console.log(`✅ Connected to WebSocket as user: {{ user.id }}`);
+            socket.emit("register_user", {{ user.id }});
+        });
 
-            // Nếu có nút gọi video, thêm sự kiện click
-            if (videoCallBtn) {
-                videoCallBtn.addEventListener("click", () => {
-                    console.log("📞 Mở cửa sổ gọi video...");
-                    const callWindow = window.open(
-                        `/call?senderId={{ user.id }}&receiverId={{ receiver.userId }}`,
-                        "_blank",
-                        "width=800,height=600"
-                    );
-                });
-            }
+        // Bắt đầu cuộc gọi (caller)
+        document.getElementById("videoCallBtn").addEventListener("click", () => {
+            console.log("📞 Gửi yêu cầu gọi...");
+            window.open(`/call?senderId={{ user.id }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
+        });
 
-            socket.on("incoming_call", ({ senderId }) => {
-                console.log(`📞 Incoming call from: ${senderId}`);
+        // Hiển thị pop-up khi có cuộc gọi đến
+        socket.on("incoming_call", ({ senderId, senderName }) => {
+            console.log(`📞 Cuộc gọi đến từ ${senderName}`);
+            document.getElementById("callerName").innerText = senderName;
+            document.getElementById("callNotification").classList.remove("hidden");
 
-                // Hiển thị popup nhận cuộc gọi
-                const callNotification = document.getElementById("callNotification");
-                const acceptCallBtn = document.getElementById("acceptCallBtn");
-
-                callNotification.classList.remove("hidden");
-
-                acceptCallBtn.addEventListener("click", () => {
-                    callNotification.classList.add("hidden");
-
-                    // Mở cửa sổ cuộc gọi
-                    window.open(
-                        `/call?senderId=${senderId}&receiverId={{ user.id }}`,
-                        "_blank",
-                        "width=800,height=600"
-                    );
-                });
-            });
-
-
-            // 🟢 Kết thúc cuộc gọi
-            document.getElementById("endCallBtn").addEventListener("click", () => {
-                console.log("🚫 Kết thúc cuộc gọi...");
-                socket.emit("end_call", { senderId: {{ user.id }}, receiverId: {{ receiver.userId }} });
-                window.close();
+            document.getElementById("acceptCallBtn").addEventListener("click", () => {
+                document.getElementById("callNotification").classList.add("hidden");
+                window.open(`/call?senderId=${senderId}&receiverId={{ user.id }}`, "_blank", "width=800,height=600");
             });
         });
     </script>
