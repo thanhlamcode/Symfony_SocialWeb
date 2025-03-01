@@ -72,7 +72,7 @@
         </div>
         <div id="callNotification" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
             <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-[400px] flex flex-col items-center">
-                <h2 class="text-xl font-bold text-white mb-4">📞 Cuộc gọi đến từ {{ receiver.name }}</h2>
+                <h2 id="callerName" class="text-xl font-bold text-white mb-4">📞 Cuộc gọi đến từ...</h2>
                 <button id="acceptCallBtn" class="bg-green-500 p-3 rounded-lg text-white hover:bg-green-600 transition">
                     Nhận cuộc gọi
                 </button>
@@ -203,6 +203,40 @@
 
             document.getElementById("acceptCallBtn").addEventListener("click", () => {
                 document.getElementById("callNotification").classList.add("hidden");
+                window.open(`/call?senderId=${senderId}&receiverId={{ user.id }}`, "_blank", "width=800,height=600");
+            });
+        });
+    </script>
+    <script>
+        // Đăng ký user với WebSocket
+        socket.on("connect", () => {
+            console.log(`✅ Connected to WebSocket as user: {{ user.id }}`);
+            socket.emit("register_user", {{ user.id }});
+        });
+
+        // 🟢 Khi nhấn nút gọi video, mở cửa sổ cuộc gọi
+        document.getElementById("videoCallBtn").addEventListener("click", () => {
+            console.log("📞 Gửi yêu cầu gọi...");
+            socket.emit("start_call", {
+                senderId: {{ user.id }},
+                receiverId: {{ receiver.userId }},
+                senderName: "{{ receiver.name }}"
+            });
+            window.open(`/call?senderId={{ user.id }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
+        });
+
+        // 🟢 Hiển thị pop-up khi có cuộc gọi đến
+        socket.on("incoming_call", ({ senderId, senderName }) => {
+            console.log(`📞 Nhận cuộc gọi từ ${senderName} (ID: ${senderId})`);
+
+            document.getElementById("callerName").innerText = senderName;
+            document.getElementById("callNotification").classList.remove("hidden");
+
+            // Nhận cuộc gọi
+            document.getElementById("acceptCallBtn").addEventListener("click", () => {
+                document.getElementById("callNotification").classList.add("hidden");
+
+                // Mở cửa sổ cuộc gọi
                 window.open(`/call?senderId=${senderId}&receiverId={{ user.id }}`, "_blank", "width=800,height=600");
             });
         });

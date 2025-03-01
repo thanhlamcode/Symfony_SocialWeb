@@ -30,8 +30,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("start_call", ({ senderId, receiverId, senderName }) => {
+        console.log(`📞 Start call from ${senderId} to ${receiverId}`);
+
         if (users[receiverId]) {
+            console.log(`📢 Gửi "incoming_call" tới ${receiverId} (socketId: ${users[receiverId]})`);
             io.to(users[receiverId]).emit("incoming_call", { senderId, senderName });
+        } else {
+            console.log(`⚠️ User ${receiverId} không online.`);
         }
     });
 
