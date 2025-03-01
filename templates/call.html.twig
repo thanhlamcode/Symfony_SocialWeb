@@ -5,12 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Call</title>
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Container của video */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Video đối phương */
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        /* Video người dùng */
+        #localVideoContainer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        #localVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        /* Khi có người tham gia, thu nhỏ video người dùng */
+        .small-video {
+            width: 150px !important;
+            height: 100px !important;
+            position: absolute;
+            bottom: 80px; /* Dư ra để không bị đè lên các nút */
+            right: 10px;
+            border: 2px solid white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Điều khiển cuộc gọi */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Nút kết thúc cuộc gọi */
+        .end-call {
+            background-color: red !important;
+        }
+
+        .end-call:hover {
+            background-color: darkred !important;
+        }
+    </style>
 </head>
 <body>
-<h2>Video Call</h2>
-<video id="localVideo" autoplay playsinline></video>
-<video id="remoteVideo" autoplay playsinline></video>
-<button id="endCallBtn">End Call</button>
+
+<!-- Container chứa video -->
+<div class="video-container">
+    <video id="remoteVideo" autoplay playsinline class="hidden"></video>
+    <div id="localVideoContainer">
+        <video id="localVideo" autoplay playsinline></video>
+    </div>
+</div>
+
+<!-- Điều khiển cuộc gọi -->
+<div class="controls">
+    <button id="toggleVideoBtn" class="control-btn">
+        <img id="videoIcon" src="https://cdn-icons-png.flaticon.com/512/747/747310.png" alt="Toggle Video">
+    </button>
+    <button id="toggleAudioBtn" class="control-btn">
+        <img id="audioIcon" src="https://cdn-icons-png.flaticon.com/512/61/61088.png" alt="Toggle Audio">
+    </button>
+    <button id="endCallBtn" class="control-btn end-call">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="End Call">
+    </button>
+</div>
 
 <script>
     const socket = io('{{ websocket_url }}');
@@ -21,6 +138,10 @@
     let peerConnection;
     const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
+    let localStream;
+    let videoEnabled = true;
+    let audioEnabled = true;
+
     socket.on("connect", () => {
         console.log(`✅ Connected to WebSocket as user: ${senderId}`);
         socket.emit("register_user", senderId);
@@ -28,12 +149,18 @@
 
     async function startCall() {
         peerConnection = new RTCPeerConnection(config);
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById("localVideo").srcObject = stream;
-        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+        // Gán video của người dùng
+        document.getElementById("localVideo").srcObject = localStream;
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
         peerConnection.ontrack = (event) => {
             document.getElementById("remoteVideo").srcObject = event.streams[0];
+            document.getElementById("remoteVideo").classList.remove("hidden");
+
+            // Khi có người tham gia, thu nhỏ video của người dùng
+            document.getElementById("localVideoContainer").classList.add("small-video");
         };
 
         peerConnection.onicecandidate = (event) => {
@@ -61,6 +188,24 @@
 
     socket.on("ice_candidate", ({ candidate }) => {
         peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    });
+
+    // Bật/tắt video
+    document.getElementById("toggleVideoBtn").addEventListener("click", () => {
+        videoEnabled = !videoEnabled;
+        localStream.getVideoTracks()[0].enabled = videoEnabled;
+        document.getElementById("videoIcon").src = videoEnabled
+            ? "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+            : "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"; // Icon video off
+    });
+
+    // Bật/tắt mic
+    document.getElementById("toggleAudioBtn").addEventListener("click", () => {
+        audioEnabled = !audioEnabled;
+        localStream.getAudioTracks()[0].enabled = audioEnabled;
+        document.getElementById("audioIcon").src = audioEnabled
+            ? "https://cdn-icons-png.flaticon.com/512/61/61088.png"
+            : "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"; // Icon mic off
     });
 
     document.getElementById("endCallBtn").addEventListener("click", () => {
