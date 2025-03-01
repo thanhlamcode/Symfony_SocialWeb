@@ -183,62 +183,63 @@
         let peerConnection;
         const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-        // Đăng ký user với WebSocket
+        {#const socket = io('{{ websocket_url }}');#}
+
+        // 🟢 Đăng ký user với WebSocket khi kết nối
         socket.on("connect", () => {
-            console.log(`✅ Connected to WebSocket as user: {{ user.id }}`);
-            socket.emit("register_user", {{ user.id }});
+            console.log(`✅ Connected to WebSocket as user: {{ profile.userId }}`);
+            socket.emit("register_user", {{ profile.userId }}); // Đăng ký ID chính xác
         });
 
-        // Bắt đầu cuộc gọi (caller)
+        // 🟢 Khi nhấn nút gọi video, gửi yêu cầu cuộc gọi và mở cửa sổ gọi
         document.getElementById("videoCallBtn").addEventListener("click", () => {
             console.log("📞 Gửi yêu cầu gọi...");
-            window.open(`/call?senderId={{ user.id }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
-        });
 
-        // Hiển thị pop-up khi có cuộc gọi đến
-        socket.on("incoming_call", ({ senderId, senderName }) => {
-            console.log(`📞 Cuộc gọi đến từ ${senderName}`);
-            document.getElementById("callerName").innerText = senderName;
-            document.getElementById("callNotification").classList.remove("hidden");
-
-            document.getElementById("acceptCallBtn").addEventListener("click", () => {
-                document.getElementById("callNotification").classList.add("hidden");
-                window.open(`/call?senderId=${senderId}&receiverId={{ user.id }}`, "_blank", "width=800,height=600");
-            });
-        });
-    </script>
-    <script>
-        // Đăng ký user với WebSocket
-        socket.on("connect", () => {
-            console.log(`✅ Connected to WebSocket as user: {{ user.id }}`);
-            socket.emit("register_user", {{ user.id }});
-        });
-
-        // 🟢 Khi nhấn nút gọi video, mở cửa sổ cuộc gọi
-        document.getElementById("videoCallBtn").addEventListener("click", () => {
-            console.log("📞 Gửi yêu cầu gọi...");
             socket.emit("start_call", {
-                senderId: {{ user.id }},
+                senderId: {{ profile.userId }},
                 receiverId: {{ receiver.userId }},
-                senderName: "{{ receiver.name }}"
+                senderName: "{{ profile.name }}"
             });
-            window.open(`/call?senderId={{ user.id }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
+
+            // Người gọi mở cửa sổ cuộc gọi
+            window.open(`/call?senderId={{ profile.userId }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
         });
 
         // 🟢 Hiển thị pop-up khi có cuộc gọi đến
         socket.on("incoming_call", ({ senderId, senderName }) => {
             console.log(`📞 Nhận cuộc gọi từ ${senderName} (ID: ${senderId})`);
 
-            document.getElementById("callerName").innerText = senderName;
+            // Đảm bảo phần tử tồn tại trước khi thay đổi
+            const callerNameElement = document.getElementById("callerName");
+            if (callerNameElement) {
+                callerNameElement.innerText = senderName;
+            }
+
             document.getElementById("callNotification").classList.remove("hidden");
 
-            // Nhận cuộc gọi
-            document.getElementById("acceptCallBtn").addEventListener("click", () => {
+            // Tránh trùng lặp sự kiện click bằng cách sử dụng cloneNode()
+            const acceptCallBtn = document.getElementById("acceptCallBtn");
+            const newAcceptCallBtn = acceptCallBtn.cloneNode(true);
+            acceptCallBtn.parentNode.replaceChild(newAcceptCallBtn, acceptCallBtn);
+
+            // Khi người nhận nhấn chấp nhận cuộc gọi
+            newAcceptCallBtn.addEventListener("click", () => {
                 document.getElementById("callNotification").classList.add("hidden");
 
-                // Mở cửa sổ cuộc gọi
-                window.open(`/call?senderId=${senderId}&receiverId={{ user.id }}`, "_blank", "width=800,height=600");
+                // Người nhận mở cửa sổ cuộc gọi
+                window.open(`/call?senderId={{ profile.userId }}&receiverId=${senderId}`, "_blank", "width=800,height=600");
             });
         });
+
+        // 🛑 Khi cuộc gọi kết thúc
+        socket.on("call_ended", () => {
+            console.log("🚫 Cuộc gọi đã kết thúc.");
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            window.close();
+        });
+
     </script>
+
 {% endblock %}
