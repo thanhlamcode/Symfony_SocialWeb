@@ -52,7 +52,7 @@
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script>
         // Kết nối đến server WebSocket
-        const socket = io('http://localhost:3000');
+        const socket = io('{{ websocket_url }}');
 
         // Gửi tin nhắn khi form được submit
         const form = document.querySelector('form');

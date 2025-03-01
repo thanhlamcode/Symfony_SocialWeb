@@ -30,6 +30,9 @@ class ChatController extends AbstractController
         // Gọi Service để lấy dữ liệu chat
         $chatData = $this->messageService->getChatData($id, $currentUser);
 
+        // Thêm key 'websocket_url' vào chatData
+        $chatData['websocket_url'] = $this->getParameter('websocket_url');
+
         return $this->render('message.html.twig', $chatData);
     }
 
