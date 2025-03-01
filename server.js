@@ -59,8 +59,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("end_call", ({ senderId, receiverId }) => {
+        console.log(`🚫 Cuộc gọi từ ${senderId} đến ${receiverId} đã kết thúc.`);
+
         if (users[receiverId]) {
             io.to(users[receiverId]).emit("call_ended");
+        }
+
+        if (users[senderId]) {
+            io.to(users[senderId]).emit("call_ended");
         }
     });
 

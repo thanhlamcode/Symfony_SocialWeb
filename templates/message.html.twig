@@ -181,10 +181,9 @@
     </script>
     {#VIDEO CALL#}
     <script>
+        let callWindow = null;  // Biến lưu trữ cửa sổ cuộc gọi
         let peerConnection;
         const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
-
-        {#const socket = io('{{ websocket_url }}');#}
 
         // 🟢 Đăng ký user với WebSocket khi kết nối
         socket.on("connect", () => {
@@ -202,8 +201,10 @@
                 senderName: "{{ profile.name }}"
             });
 
-            // Người gọi mở cửa sổ cuộc gọi
-            window.open(`/call?senderId={{ profile.userId }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
+            // Nếu chưa có cửa sổ cuộc gọi, mở mới
+            if (!callWindow || callWindow.closed) {
+                callWindow = window.open(`/call?senderId={{ profile.userId }}&receiverId={{ receiver.userId }}`, "_blank", "width=800,height=600");
+            }
         });
 
         // 🟢 Hiển thị pop-up khi có cuộc gọi đến
@@ -227,9 +228,10 @@
             newAcceptCallBtn.addEventListener("click", () => {
                 document.getElementById("callNotification").classList.add("hidden");
 
-                // Người nhận mở cửa sổ cuộc gọi
-                window.open(`/call?senderId={{ profile.userId }}&receiverId=${senderId}`, "_blank", "width=800,height=600");
-            });
+                // Nếu chưa có cửa sổ cuộc gọi, mở mới
+                if (!callWindow || callWindow.closed) {
+                    callWindow = window.open(`/call?senderId={{ profile.userId }}&receiverId=${senderId}`, "_blank", "width=800,height=600");
+                }});
         });
 
         // 🛑 Khi cuộc gọi kết thúc
@@ -238,8 +240,10 @@
             if (peerConnection) {
                 peerConnection.close();
             }
-            window.close();
-        });
+            // Kiểm tra nếu cửa sổ vẫn tồn tại, mới gọi `close()`
+            if (callWindow && !callWindow.closed) {
+                callWindow.close();
+            }});
 
     </script>
 
