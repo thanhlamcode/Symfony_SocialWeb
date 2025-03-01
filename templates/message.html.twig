@@ -216,28 +216,32 @@
         socket.on("incoming_call", ({ senderId, senderName }) => {
             console.log(`📞 Nhận cuộc gọi từ ${senderName} (ID: ${senderId})`);
 
-            // Đảm bảo phần tử tồn tại trước khi thay đổi
+            // Đảm bảo cập nhật tên người gọi
             const callerNameElement = document.getElementById("callerName");
             if (callerNameElement) {
                 callerNameElement.innerText = senderName;
             }
 
+            // Hiển thị popup nhận cuộc gọi
             document.getElementById("callNotification").classList.remove("hidden");
 
-            // Tránh trùng lặp sự kiện click bằng cách sử dụng cloneNode()
+            // Tránh gán sự kiện nhiều lần
             const acceptCallBtn = document.getElementById("acceptCallBtn");
-            const newAcceptCallBtn = acceptCallBtn.cloneNode(true);
-            acceptCallBtn.parentNode.replaceChild(newAcceptCallBtn, acceptCallBtn);
 
-            // Khi người nhận nhấn chấp nhận cuộc gọi
+            // Xóa sự kiện trước đó nếu có
+            acceptCallBtn.replaceWith(acceptCallBtn.cloneNode(true));
+            const newAcceptCallBtn = document.getElementById("acceptCallBtn");
+
             newAcceptCallBtn.addEventListener("click", () => {
                 document.getElementById("callNotification").classList.add("hidden");
 
                 // Nếu chưa có cửa sổ cuộc gọi, mở mới
                 if (!callWindow || callWindow.closed) {
                     callWindow = window.open(`/call?senderId={{ profile.userId }}&receiverId=${senderId}`, "_blank", "width=800,height=600");
-                }});
+                }
+            });
         });
+
 
         // 🛑 Khi cuộc gọi kết thúc
         socket.on("call_ended", () => {
@@ -245,10 +249,16 @@
             if (peerConnection) {
                 peerConnection.close();
             }
-            // Kiểm tra nếu cửa sổ vẫn tồn tại, mới gọi `close()`
+
+            // Kiểm tra nếu cửa sổ cuộc gọi vẫn tồn tại, đóng lại
             if (callWindow && !callWindow.closed) {
                 callWindow.close();
-            }});
+            }
+
+            // Đảm bảo popup được reset cho cuộc gọi tiếp theo
+            document.getElementById("callNotification").classList.add("hidden");
+        });
+
 
     </script>
 
