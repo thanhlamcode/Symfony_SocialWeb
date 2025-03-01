@@ -33,6 +33,8 @@ class ChatController extends AbstractController
         // Thêm key 'websocket_url' vào chatData
         $chatData['websocket_url'] = $this->getParameter('websocket_url');
 
+//        dump($chatData); exit();
+
         return $this->render('message.html.twig', $chatData);
     }
 
