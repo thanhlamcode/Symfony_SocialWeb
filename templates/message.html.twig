@@ -59,17 +59,6 @@
                 </button>
             </form>
         </div>
-        <!-- Pop-up cuộc gọi -->
-        <div id="callPopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-            <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-[500px] flex flex-col items-center">
-                <h2 class="text-xl font-bold text-white mb-4">Đang gọi {{ receiver.name }}...</h2>
-                <video id="localVideo" class="w-full h-[300px] bg-black rounded-md" autoplay></video>
-                <video id="remoteVideo" class="w-full h-[300px] bg-black rounded-md hidden" autoplay></video>
-                <button id="endCallBtn" class="mt-4 bg-red-500 p-3 rounded-full hover:bg-red-600 transition">
-                    <img src="{{ asset('icons/end-call.png') }}" class="w-8 h-8" alt="End Call">
-                </button>
-            </div>
-        </div>
         <div id="callNotification" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
             <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-[400px] flex flex-col items-center">
                 <h2 id="callerName" class="text-xl font-bold text-white mb-4">📞 Cuộc gọi đến từ...</h2>
@@ -257,6 +246,7 @@
 
             // Đảm bảo popup được reset cho cuộc gọi tiếp theo
             document.getElementById("callNotification").classList.add("hidden");
+            window.location.href = `http://localhost:8000/dashboard/message/{{ receiver.userId }}`;
         });
 
 
