@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Service\FriendService;
 use App\Service\MessageService;
-use App\Service\User\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +43,8 @@ class ChatController extends AbstractController
         }
 
         // Lấy nội dung tin nhắn từ request
-        $content = trim($request->request->get('message'));
+        $data = json_decode($request->getContent(), true);
+        $content = trim($data['message']);
         if (empty($content)) {
             return $this->redirectToRoute('chat_message', ['id' => $id]);
         }
@@ -52,8 +52,9 @@ class ChatController extends AbstractController
         // Gửi tin nhắn qua MessageService
         $this->messageService->sendMessage($currentUser->getId(), $id, $content);
 
-        // Chuyển hướng về trang chat sau khi gửi tin nhắn
-        return $this->redirectToRoute('chat_message', ['id' => $id]);
+        // Trả về một phản hồi không chuyển hướng (có thể thay thế với 1 phản hồi JSON nếu cần)
+        return new JsonResponse(['status' => 'success']);
     }
+
 
 }

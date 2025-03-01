@@ -58,7 +58,7 @@
         const form = document.querySelector('form');
         const inputMessage = document.querySelector('input[name="message"]');
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = inputMessage.value;
 
@@ -73,6 +73,10 @@
                 userAvatar: '{{ user.avatar }}',
                 receiverAvatar: '{{ receiver.avatar }}'
             });
+
+            // Gọi API Symfony để lưu vào database
+            // Gửi tin nhắn vào cơ sở dữ liệu qua API Symfony
+            await sendMessageToBackend(message);
 
             // Xóa nội dung input
             inputMessage.value = '';
