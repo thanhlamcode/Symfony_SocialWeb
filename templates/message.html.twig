@@ -138,5 +138,14 @@
             } catch (error) {
                 console.error('Error:', error);
             }}
+
+        // Hàm cuộn xuống tin nhắn mới nhất khi tải trang
+        function scrollToBottom() {
+            const messagesContainer = document.querySelector('.main-chat');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Gọi hàm khi trang tải xong
+        window.onload = scrollToBottom;
     </script>
 {% endblock %}
