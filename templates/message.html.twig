@@ -113,42 +113,47 @@
             inputMessage.value = '';
         });
 
-        // Lắng nghe sự kiện nhận tin nhắn từ server và hiển thị tin nhắn mới
-        socket.on('receive_message', (message) => {
+        // Lắng nghe tin nhắn từ server và chỉ hiển thị nếu là tin nhắn liên quan
+        socket.on("receive_message", (message) => {
+            if (message.senderId !== {{ user.id }} && message.receiverId !== {{ user.id }}) {
+                return; // Không hiển thị tin nhắn không liên quan
+            }
+
             const messagesContainer = document.querySelector('.main-chat');
             const messageElement = document.createElement('div');
             messageElement.classList.add('flex', 'items-start', 'space-x-3');
 
-            // Hiển thị tin nhắn gửi từ người dùng hiện tại hoặc người nhận
+            // Hiển thị tin nhắn gửi từ chính mình hoặc từ người khác
             if (message.senderId === {{ user.id }}) {
                 messageElement.classList.add('justify-end');
                 messageElement.innerHTML = `
-                <div class="bg-blue-500 p-3 rounded-lg max-w-md">
-                    <p class="text-sm font-bold">${message.userName}</p>
-                    <p class="mt-1">${message.text}</p>
-                    <div class="flex space-x-2 text-gray-300 text-xs mt-1">
-                        <span>${message.time}</span>
-                    </div>
+            <div class="bg-blue-500 p-3 rounded-lg max-w-md">
+                <p class="text-sm font-bold">${message.userName}</p>
+                <p class="mt-1">${message.text}</p>
+                <div class="flex space-x-2 text-gray-300 text-xs mt-1">
+                    <span>${message.time}</span>
                 </div>
-                <img src="${message.userAvatar}" class="w-10 h-10 rounded-full">
-            `;
+            </div>
+            <img src="${message.userAvatar}" class="w-10 h-10 rounded-full">
+        `;
             } else {
                 messageElement.innerHTML = `
-                <img src="{{ receiver.avatar }}" class="w-10 h-10 rounded-full">
-                <div class="bg-gray-700 p-3 rounded-lg max-w-md">
-                    <p class="text-sm font-bold">{{ receiver.name }}</p>
-                    <p class="mt-1">${message.text}</p>
-                    <div class="flex space-x-2 text-gray-400 text-xs mt-1">
-                        <span>${message.time}</span>
-                    </div>
+            <img src="${message.receiverAvatar}" class="w-10 h-10 rounded-full">
+            <div class="bg-gray-700 p-3 rounded-lg max-w-md">
+                <p class="text-sm font-bold">${message.receiverName}</p>
+                <p class="mt-1">${message.text}</p>
+                <div class="flex space-x-2 text-gray-400 text-xs mt-1">
+                    <span>${message.time}</span>
                 </div>
-            `;
+            </div>
+        `;
             }
 
             // Thêm tin nhắn vào container
             messagesContainer.appendChild(messageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;  // Cuộn xuống dưới cùng khi có tin nhắn mới
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         });
+
 
         // Hàm gửi tin nhắn vào backend Symfony để lưu vào cơ sở dữ liệu
         async function sendMessageToBackend(message) {

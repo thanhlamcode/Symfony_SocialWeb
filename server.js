@@ -20,9 +20,19 @@ io.on("connection", (socket) => {
 
     // 🟢 ✅ XỬ LÝ CHAT
     socket.on("send_message", (message) => {
-        console.log("💬 Message received:", message);
-        io.emit("receive_message", message); // Phát lại tin nhắn cho tất cả người dùng
+        console.log(`💬 Tin nhắn từ ${message.senderId} đến ${message.receiverId}: ${message.text}`);
+
+        // Gửi tin nhắn đến người nhận (chỉ nếu họ đang online)
+        if (users[message.receiverId]) {
+            io.to(users[message.receiverId]).emit("receive_message", message);
+        }
+
+        // Cũng gửi tin nhắn đến chính người gửi để cập nhật giao diện
+        if (users[message.senderId]) {
+            io.to(users[message.senderId]).emit("receive_message", message);
+        }
     });
+
 
     socket.on("register_user", (userId) => {
         users[userId] = socket.id;
