@@ -280,13 +280,17 @@
             }
         }
 
-        // Đóng cảnh báo khi nhấn "Đã hiểu"
+        // Đóng cảnh báo khi nhấn "Đã hiểu" và load lại trang
         document.getElementById("closeCallAlert").addEventListener("click", () => {
             const callAlert = document.getElementById("callAlert");
             if (callAlert) {
                 callAlert.classList.add("hidden");
             }
+
+            // Load lại trang
+            location.reload();
         });
+
 
         // Khi load lại trang, mở lại chat bình thường
         window.addEventListener("load", () => {
