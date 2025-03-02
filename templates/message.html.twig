@@ -89,9 +89,9 @@
                 text: message,
                 time: new Date().toLocaleTimeString(),
                 userName: '{{ user.name }}',
-                receiverName: '{{ receiver.name }}',
+                receiverName: '{{ profile.name }}',
                 userAvatar: '{{ user.avatar }}',
-                receiverAvatar: '{{ receiver.avatar }}'
+                receiverAvatar: '{{ profile.avatar }}'
             });
 
             // Gọi API Symfony để lưu vào database
