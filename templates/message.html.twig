@@ -2,6 +2,13 @@
 
 {% block chat_content %}
     <div class="w-full sm:w-[70%] bg-gray-900 p-6 text-white flex flex-col h-screen">
+        <div id="callAlert" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center hidden">
+            <div class="bg-red-600 p-6 rounded-lg shadow-lg text-white text-center w-[400px]">
+                <h2 class="text-lg font-bold">⚠️ Lưu ý khi gọi!</h2>
+                <p class="mt-2">Bạn không thể nhắn tin khi đang gọi.<br>Vui lòng tải lại trang sau khi kết thúc cuộc gọi để tiếp tục chat.</p>
+                <button id="closeCallAlert" class="bg-gray-800 mt-4 px-4 py-2 rounded-lg">Đã hiểu</button>
+            </div>
+        </div>
         <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between shadow-md">
             <div>
                 <h2 class="text-xl font-bold">{{ receiver.name }}</h2>
@@ -249,6 +256,50 @@
             window.location.href = `http://localhost:8000/dashboard/message/{{ receiver.userId }}`;
         });
 
+
+    </script>
+    <script>
+        document.getElementById("audioCallBtn").addEventListener("click", handleCall);
+        document.getElementById("videoCallBtn").addEventListener("click", handleCall);
+
+        function handleCall() {
+            const chatInput = document.querySelector('input[name="message"]');
+            const sendBtn = document.querySelector('button[type="submit"]');
+            const callAlert = document.getElementById("callAlert");
+
+            if (chatInput && sendBtn) {
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
+                chatInput.placeholder = "Bạn không thể nhắn tin khi đang gọi...";
+                chatInput.classList.add("opacity-50", "cursor-not-allowed");
+            }
+
+            // Hiển thị thông báo cảnh báo
+            if (callAlert) {
+                callAlert.classList.remove("hidden");
+            }
+        }
+
+        // Đóng cảnh báo khi nhấn "Đã hiểu"
+        document.getElementById("closeCallAlert").addEventListener("click", () => {
+            const callAlert = document.getElementById("callAlert");
+            if (callAlert) {
+                callAlert.classList.add("hidden");
+            }
+        });
+
+        // Khi load lại trang, mở lại chat bình thường
+        window.addEventListener("load", () => {
+            const chatInput = document.querySelector('input[name="message"]');
+            const sendBtn = document.querySelector('button[type="submit"]');
+
+            if (chatInput && sendBtn) {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.placeholder = "Your message";
+                chatInput.classList.remove("opacity-50", "cursor-not-allowed");
+            }
+        });
 
     </script>
 
