@@ -68,7 +68,13 @@
         </div>
         <div id="callNotification" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
             <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-[400px] flex flex-col items-center">
+                <!-- Ảnh đại diện của người gọi -->
+                <img id="callerAvatar" src="/default-avatar.png" alt="Avatar" class="w-16 h-16 rounded-full mb-4 border-2 border-white shadow-lg">
+
+                <!-- Tên người gọi -->
                 <h2 id="callerName" class="text-xl font-bold text-white mb-4">📞 Cuộc gọi đến từ...</h2>
+
+                <!-- Nút nhận cuộc gọi -->
                 <button id="acceptCallBtn" class="bg-green-500 p-3 rounded-lg text-white hover:bg-green-600 transition">
                     Nhận cuộc gọi
                 </button>
@@ -199,7 +205,8 @@
             socket.emit("start_call", {
                 senderId: {{ profile.userId }},
                 receiverId: {{ receiver.userId }},
-                senderName: "{{ profile.name }}"
+                senderName: "{{ profile.name }}",
+                avatarSender: "{{ profile.avatar }}"
             });
 
             // Nếu chưa có cửa sổ cuộc gọi, mở mới
@@ -209,13 +216,21 @@
         });
 
         // 🟢 Hiển thị pop-up khi có cuộc gọi đến
-        socket.on("incoming_call", ({ senderId, senderName }) => {
+        socket.on("incoming_call", ({ senderId, senderName, avatarSender }) => {
             console.log(`📞 Nhận cuộc gọi từ ${senderName} (ID: ${senderId})`);
 
-            // Đảm bảo cập nhật tên người gọi
+            // Cập nhật tên người gọi
             const callerNameElement = document.getElementById("callerName");
             if (callerNameElement) {
                 callerNameElement.innerText = senderName;
+            }
+
+            console.log(avatarSender);
+
+            // Cập nhật ảnh đại diện người gọi
+            const callerAvatarElement = document.getElementById("callerAvatar");
+            if (callerAvatarElement) {
+                callerAvatarElement.src = avatarSender || "/default-avatar.png"; // Dùng ảnh mặc định nếu không có avatar
             }
 
             // Hiển thị popup nhận cuộc gọi
@@ -239,7 +254,6 @@
 
             handleCall();
         });
-
 
         // 🛑 Khi cuộc gọi kết thúc
         socket.on("call_ended", () => {
