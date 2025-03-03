@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+require("dotenv").config(); // Load biến môi trường từ .env
 
 const app = express();
 const server = http.createServer(app);
@@ -90,7 +91,10 @@ io.on("connection", (socket) => {
     });
 });
 
+// Sử dụng PORT từ Render hoặc mặc định là 3000 khi chạy local
+const PORT = process.env.PORT || 3000;
+
 // Lắng nghe trên cổng 3000
-server.listen(3000, () => {
-    console.log("🚀 Chat & Call Server running on http://localhost:3000");
+server.listen(PORT, () => {
+    console.log(`🚀 Chat & Call Server running on http://localhost:${PORT}`);
 });
