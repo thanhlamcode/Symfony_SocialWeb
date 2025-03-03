@@ -20,3 +20,78 @@ yarn-error.log
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# ============================
+#  NODEJS (Frontend)
+# ============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+.DS_Store
+
+# Build files
+dist/
+build/
+.next/
+out/
+coverage/
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Editor logs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ============================
+#  SYMFONY (Backend - PHP)
+# ============================
+.env
+.env.test
+.env.dev
+/.phpunit.result.cache
+/public/uploads/
+/config/jwt/*
+/coverage/
+/phpunit.xml
+/phpunit.xml.dist
+
+# Logs & Cache
+/logs/
+*.log
+/var/log/*
+/var/cache/*
+/var/sessions/*
+
+# Composer dependencies
+/composer.lock
+
+# Symfony Encore/Webpack build files
+
+# Database & Migration files
+/migrations/*
+/*.sqlite
+/data/*.sqlite
+/data/*.sqlite3
+
+# Ignore static assets generated during builds
+/public/media/
+
+# ============================
+#  OTHER
+# ============================
+/.idea/            # JetBrains IDE (PhpStorm, WebStorm)
+/.vscode/          # Visual Studio Code
+*.iml             # JetBrains project files
+*.sublime-project # Sublime Text project files
+*.sublime-workspace
+
+# MacOS system files
+._*
+.Trashes
