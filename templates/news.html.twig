@@ -12,22 +12,29 @@
                 <div class="bg-gray-800 p-4 rounded-lg shadow-md mb-4">
                     <div class="flex items-center space-x-3">
                         <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
-                        <input type="text" placeholder="{{ profile.name}} ơi, bạn đang nghĩ gì thế?"
-                               class="flex-1 bg-gray-700 text-white p-2 rounded-full outline-none placeholder-gray-400">
+                        <input type="text" placeholder="{{ profile.name }} ơi, bạn đang nghĩ gì thế?"
+                               class="flex-1 bg-gray-700 text-white p-2 rounded-full outline-none placeholder-gray-400 cursor-pointer"
+                               id="openModal">
                     </div>
-                    <div class="flex justify-between mt-3 text-gray-400">
-                        <button class="flex items-center space-x-2 hover:text-red-500">
-                            <img src="{{ asset('icons/live.png') }}" class="w-6 h-6">
-                            <span>Video trực tiếp</span>
-                        </button>
-                        <button class="flex items-center space-x-2 hover:text-green-500">
-                            <img src="{{ asset('icons/photo.png') }}" class="w-6 h-6">
-                            <span>Ảnh/video</span>
-                        </button>
-                        <button class="flex items-center space-x-2 hover:text-yellow-500">
-                            <img src="{{ asset('icons/emoji.png') }}" class="w-6 h-6">
-                            <span>Cảm xúc/hoạt động</span>
-                        </button>
+                </div>
+
+                <!-- Modal đăng trạng thái -->
+                <div id="postModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-white text-lg font-semibold">Tạo bài viết</h2>
+                            <button id="closeModal" class="text-gray-400 hover:text-white">✖</button>
+                        </div>
+
+                        <!-- Nội dung nhập TinyMCE -->
+                        <textarea id="postContent"></textarea>
+
+                        <!-- Nút đăng bài -->
+                        <div class="flex justify-end mt-4">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                Đăng bài
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -147,4 +154,33 @@
                 </div>
             </div>
         </div>
+
+    <!-- Script TinyMCE và Modal -->
+    <script src="https://cdn.tiny.cloud/1/4ap6sni821pn56o84cses0860nmtuvurlwoxovop0j9t37j5/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Khởi tạo TinyMCE
+            tinymce.init({
+                selector: '#postContent',
+                menubar: false,
+                plugins: 'autolink lists link image charmap preview',
+                toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
+                skin: "oxide-dark",
+                content_css: "dark"
+            });
+
+            // Modal
+            const modal = document.getElementById("postModal");
+            const openModal = document.getElementById("openModal");
+            const closeModal = document.getElementById("closeModal");
+
+            openModal.addEventListener("click", function () {
+                modal.classList.remove("hidden");
+            });
+
+            closeModal.addEventListener("click", function () {
+                modal.classList.add("hidden");
+            });
+        });
+    </script>
 {% endblock %}
