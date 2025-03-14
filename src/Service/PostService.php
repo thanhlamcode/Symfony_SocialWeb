@@ -35,7 +35,7 @@ class PostService
         return $post;
     }
 
-    public function getRecentPosts(int $limit = 10): array
+    public function getRecentPosts(int $limit = 50): array
     {
         $posts = $this->postRepository->findBy([], ['createdAt' => 'DESC'], $limit);
 
@@ -44,9 +44,14 @@ class PostService
             $author = $this->userService->getUserProfileById($authorId);
             $post->avatarAuthor = $author['avatar'];
             $post->authorName = $author['name'];
+
+            // Cộng thêm 7 tiếng vào createdAt
+            if ($post->getCreatedAt() instanceof \DateTime) {
+                $adjustedDate = (clone $post->getCreatedAt())->modify('+7 hours');
+                $post->setCreatedAt($adjustedDate); // Dùng setter thay vì gán trực tiếp
+            }
         }
 
         return $posts;
     }
-
 }

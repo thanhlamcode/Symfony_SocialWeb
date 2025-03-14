@@ -43,6 +43,6 @@ class PostController extends AbstractController
 
         // ✅ Chuyển hướng về trang dashboard với thông báo thành công
         $this->addFlash('success', 'Bài viết đã được đăng!');
-        return $this->redirectToRoute('dashboard');
+        return $this->redirectToRoute('news');
     }
 }
