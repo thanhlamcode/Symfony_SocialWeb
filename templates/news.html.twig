@@ -38,37 +38,42 @@
                 </div>
 
                 {# Danh sách bạn bè #}
-                <div class="flex space-x-4 overflow-x-auto p-2 justify-center">
-                    {# Hồ sơ của bạn - Hiển thị avatar #}
-                    <div class="relative w-28 h-48 bg-gray-800 rounded-xl overflow-hidden flex flex-col justify-end">
-                        <img src="{{ profile.avatar }}" class="absolute top-0 w-full h-full object-cover opacity-50">
-                        <div class="flex flex-col items-center p-2 relative">
-                            <button class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center border-4 border-gray-800">
-                                +
-                            </button>
-                            <p class="text-xs mt-1">Hồ sơ của bạn</p>
+                <div class="relative w-full max-w-2xl mx-auto">
+                    <!-- Swiper Container -->
+                    <div class="swiper mySwiper">
+                        <div class="swiper-wrapper">
+
+                            {# Hồ sơ của bạn #}
+                            <div class="swiper-slide relative w-32 h-48 bg-gray-800 rounded-xl overflow-hidden flex flex-col justify-end shrink-0">
+                                <img src="{{ profile.avatar }}" class="w-full h-full object-cover">
+                                <div class="flex flex-col items-center p-2 relative">
+                                    <button class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center border-4 border-gray-800">
+                                        +
+                                    </button>
+                                    <p class="text-xs mt-1">Hồ sơ của bạn</p>
+                                </div>
+                            </div>
+
+                            {# Danh sách bạn bè #}
+                            {% for friend in friendList %}
+                                <div class="swiper-slide relative w-32 h-48 bg-gray-800 rounded-xl overflow-hidden shrink-0">
+                                    <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
+                                    {# Avatar bạn bè #}
+                                    <div class="absolute top-2 left-2 w-10 h-10 border-4 border-gray-900 rounded-full overflow-hidden">
+                                        <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
+                                    </div>
+                                    {# Tên bạn bè #}
+                                    <div class="absolute bottom-2 left-2 text-sm font-semibold truncate w-full text-center px-2">
+                                        {{ friend.name }}
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
+
+                        <!-- Nút bấm trái/phải -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
                     </div>
-
-                    {# Danh sách bạn bè #}
-                    {% for friend in friendList %}
-                        <div class="relative w-28 h-48 bg-gray-800 rounded-xl overflow-hidden">
-                            <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
-                            {# Avatar bạn bè #}
-                            <div class="absolute top-2 left-2 w-10 h-10 border-4 border-gray-900 rounded-full overflow-hidden">
-                                <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
-                            </div>
-                            {# Tên bạn bè #}
-                            <div class="absolute bottom-2 left-2 text-sm font-semibold">
-                                {{ friend.name }}
-                            </div>
-                        </div>
-                    {% endfor %}
-
-                    {# Nút bấm cuộn ngang #}
-                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-700">
-                        →
-                    </button>
                 </div>
 
             </div>
@@ -168,6 +173,26 @@
 
     <!-- Script TinyMCE và Modal -->
     <script src="https://cdn.tiny.cloud/1/4ap6sni821pn56o84cses0860nmtuvurlwoxovop0j9t37j5/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- Nhúng Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+    <!-- Nhúng Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Swiper Init -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 4,   // Hiển thị 4 ô bạn bè mỗi lần
+            spaceBetween: 15,   // Khoảng cách giữa các ô
+            navigation: {       // Nút điều hướng
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            grabCursor: true,   // Hiệu ứng bàn tay khi rê chuột
+            loop: false,        // Không lặp vô hạn
+        });
+    </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Khởi tạo TinyMCE
