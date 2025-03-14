@@ -415,7 +415,7 @@
 
             // Gửi request cập nhật bài viết bằng AJAX
             editForm.addEventListener("submit", function (e) {
-                e.preventDefault(); // Ngăn chặn form submit mặc định
+                e.preventDefault(); // Ngăn chặn load lại trang
 
                 const newContent = tinymce.get('editContent').getContent(); // Lấy nội dung từ TinyMCE
 
@@ -428,11 +428,26 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        alert(data.message);
-                        editModal.style.display = "none"; // Ẩn modal sau khi chỉnh sửa
-                        window.location.href = "/dashboard/news"; // Quay lại trang tin tức
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            editModal.style.display = "none"; // Ẩn modal sau khi chỉnh sửa
+                            window.location.href = "/dashboard/news"; // Quay lại trang tin tức
+                        });
                     })
-                    .catch(error => console.error("Lỗi:", error));
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: "Có lỗi xảy ra khi chỉnh sửa bài viết.",
+                            showConfirmButton: true
+                        });
+                        console.error("Lỗi:", error);
+                    });
             });
 
             // Hàm mở modal chỉnh sửa từ nút "Chỉnh sửa"
@@ -447,19 +462,43 @@
         });
 
         function deletePost(postId) {
-            console.log("Đang xóa bài viết có ID:", postId); // Kiểm tra sự kiện click
-
-            if (!confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
-
-            fetch(`/post/delete/${postId}`, {
-                method: "DELETE",
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload(); // Cập nhật trang sau khi xóa
-                })
-                .catch(error => console.error("Lỗi:", error));
+            Swal.fire({
+                title: "Bạn có chắc chắn muốn xóa bài viết?",
+                text: "Hành động này không thể hoàn tác!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Xóa",
+                cancelButtonText: "Hủy"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/post/delete/${postId}`, {
+                        method: "DELETE",
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // Làm mới trang sau khi xóa
+                            });
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: "Có lỗi xảy ra khi xóa bài viết.",
+                                showConfirmButton: true
+                            });
+                            console.error("Lỗi:", error);
+                        });
+                }
+            });
         }
     </script>
 
