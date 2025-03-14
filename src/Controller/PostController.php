@@ -50,6 +50,7 @@ class PostController extends AbstractController
     /**
      * @Route("/post/edit/{id}", name="post_edit", methods={"POST"})
      */
+    #[Route('/post/edit/{id}', name: 'post_edit', methods: ['POST'])]
     public function editPost(int $id, Request $request): JsonResponse
     {
         // ✅ Lấy user hiện tại từ UserService
