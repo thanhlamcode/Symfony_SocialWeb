@@ -96,4 +96,24 @@ class PostController extends AbstractController
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
+
+    /**
+     * @Route("/post/{id}", name="get_post", methods={"GET"})
+     */
+    #[Route('/post/{id}', name: 'get_post', methods: ['GET'])]
+    public function getPost(int $id): JsonResponse
+    {
+        $post = $this->postService->getPostById($id);
+
+        if (!$post) {
+            return $this->json(['message' => 'Bài viết không tồn tại'], 404);
+        }
+
+        return $this->json([
+            'id' => $post->getId(),
+            'content' => $post->getContent()
+        ]);
+    }
+
+
 }

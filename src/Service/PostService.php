@@ -90,4 +90,10 @@ class PostService
 
         $this->postRepository->deletePost($post);
     }
+
+    public function getPostById(int $postId): ?Post
+    {
+        return $this->postRepository->find($postId);
+    }
+
 }

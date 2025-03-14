@@ -178,6 +178,28 @@
                     </div>
                 </div>
 
+                {# Modal edit bài viết #}
+                <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-[99999]">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 relative z-[99999]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-white text-lg font-semibold">Chỉnh sửa bài viết</h2>
+                            <button id="closeEditModal" class="text-gray-400 hover:text-white text-xl">✖</button>
+                        </div>
+
+                        <!-- Form chỉnh sửa -->
+                        <form id="editForm" method="POST">
+                            <textarea name="content" id="editContent" class="w-full h-32 p-2 rounded-lg bg-gray-700 text-white"></textarea>
+
+                            <!-- Nút cập nhật -->
+                            <div class="flex justify-end mt-4">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                    Cập nhật bài viết
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
             </div>
             {# Danh sách bài viết #}
             <div class="bg-gray-900 min-h-screen text-white p-6 h-full">
@@ -238,6 +260,7 @@
 
         </div>
     </div>
+
 
     <!-- Script TinyMCE và Modal -->
     <script src="https://cdn.tiny.cloud/1/4ap6sni821pn56o84cses0860nmtuvurlwoxovop0j9t37j5/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
@@ -326,26 +349,85 @@
     </script>
 
     <script>
-        function editPost(postId) {
-            console.log("Đang chỉnh sửa bài viết có ID:", postId); // Kiểm tra sự kiện click
+        document.addEventListener("DOMContentLoaded", function () {
+            // Modal chỉnh sửa
+            const editModal = document.getElementById("editModal");
+            const closeEditModal = document.getElementById("closeEditModal");
+            const editForm = document.getElementById("editForm");
+            let currentPostId = null;
 
-            const newContent = prompt("Nhập nội dung mới:");
-            if (!newContent) return;
+            // Hàm khởi tạo TinyMCE nếu chưa có
+            function initTinyMCE(callback) {
+                if (!tinymce.get('editContent')) {
+                    tinymce.init({
+                        selector: '#editContent',
+                        menubar: false,
+                        plugins: 'autolink lists link image charmap preview',
+                        toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
+                        skin: "oxide-dark",
+                        content_css: "dark",
+                        setup: function (editor) {
+                            editor.on('init', function () {
+                                console.log("TinyMCE đã khởi tạo");
+                                if (callback) callback();
+                            });
+                        }
+                    });
+                } else {
+                    if (callback) callback();
+                }
+            }
 
-            fetch(`/post/edit/${postId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ content: newContent }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload(); // Cập nhật trang sau khi chỉnh sửa
+            // Mở modal chỉnh sửa
+            function openEditModal(postId, currentContent) {
+                currentPostId = postId;
+                editForm.action = `/post/edit/${postId}`;
+
+                // Đảm bảo TinyMCE đã khởi tạo trước khi set nội dung
+                initTinyMCE(() => {
+                    tinymce.get('editContent').setContent(currentContent);
+                });
+
+                // Hiển thị modal
+                editModal.classList.remove("hidden");
+            }
+
+            // Đóng modal chỉnh sửa
+            closeEditModal.addEventListener("click", function () {
+                editModal.classList.add("hidden");
+            });
+
+            // Gửi request cập nhật bài viết
+            editForm.addEventListener("submit", function (e) {
+                e.preventDefault(); // Ngăn chặn load lại trang
+
+                const newContent = tinymce.get('editContent').getContent(); // Lấy nội dung từ TinyMCE
+
+                fetch(`/post/edit/${currentPostId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ content: newContent }),
                 })
-                .catch(error => console.error("Lỗi:", error));
-        }
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        location.reload(); // Làm mới trang sau khi chỉnh sửa
+                    })
+                    .catch(error => console.error("Lỗi:", error));
+            });
+
+            // Hàm mở modal chỉnh sửa từ nút "Chỉnh sửa"
+            window.editPost = function (postId) {
+                fetch(`/post/${postId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        openEditModal(postId, data.content);
+                    })
+                    .catch(error => console.error("Lỗi khi lấy nội dung bài viết:", error));
+            };
+        });
 
         function deletePost(postId) {
             console.log("Đang xóa bài viết có ID:", postId); // Kiểm tra sự kiện click
