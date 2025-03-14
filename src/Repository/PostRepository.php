@@ -24,12 +24,17 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
-    public function findLatestPosts(int $limit = 10): array
+    public function updatePost(Post $post): void
     {
-        return $this->createQueryBuilder('p')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+        $em = $this->getEntityManager();
+        $em->persist($post);
+        $em->flush();
+    }
+
+    public function deletePost(Post $post): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($post);
+        $em->flush();
     }
 }

@@ -197,10 +197,10 @@
                                 {# Nút chỉnh sửa & xóa (Chỉ hiển thị nếu là tác giả) #}
                                 {% if post.idAuthor == profile.userId %}
                                     <div class="flex space-x-2">
-                                        <button class="text-blue-400 hover:text-blue-300 transition">
+                                        <button class="text-blue-400 hover:text-blue-300 transition" onclick="editPost({{ post.id }})">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="text-red-400 hover:text-red-300 transition">
+                                        <button class="text-red-400 hover:text-red-300 transition" onclick="deletePost({{ post.id }})">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
@@ -324,5 +324,47 @@
             });
         });
     </script>
+
+    <script>
+        function editPost(postId) {
+            console.log("Đang chỉnh sửa bài viết có ID:", postId); // Kiểm tra sự kiện click
+
+            const newContent = prompt("Nhập nội dung mới:");
+            if (!newContent) return;
+
+            fetch(`/post/edit/${postId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ content: newContent }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload(); // Cập nhật trang sau khi chỉnh sửa
+                })
+                .catch(error => console.error("Lỗi:", error));
+        }
+
+        function deletePost(postId) {
+            console.log("Đang xóa bài viết có ID:", postId); // Kiểm tra sự kiện click
+
+            if (!confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
+
+            fetch(`/post/delete/${postId}`, {
+                method: "DELETE",
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload(); // Cập nhật trang sau khi xóa
+                })
+                .catch(error => console.error("Lỗi:", error));
+        }
+    </script>
+
+    {# Include Alert Component #}
+    {% include 'components/alert.html.twig' %}
 
 {% endblock %}
