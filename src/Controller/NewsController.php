@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\FriendService;
+use App\Service\PostService;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,10 +14,14 @@ class NewsController extends AbstractController
     private UserServiceInterface $userService;
 
     private FriendService $friendService;
+    private PostService $postService;
 
-    public function __construct(UserServiceInterface $userService, FriendService $friendService){
+
+    public function __construct(UserServiceInterface $userService, FriendService $friendService,
+    PostService $postService){
         $this->userService = $userService;
         $this->friendService = $friendService;
+        $this->postService = $postService;
     }
 
     #[Route('/dashboard/news', name: 'news')]
@@ -30,6 +35,11 @@ class NewsController extends AbstractController
         $user = [
             'avatar' => '/images/user_avatar.jpg'
         ];
+
+        // ✅ Lấy danh sách bài viết từ PostService
+        $posts = $this->postService->getRecentPosts();
+
+//        dump($posts); exit();
 
         $stories = [
             [
@@ -80,7 +90,8 @@ class NewsController extends AbstractController
             'stories' => $stories,
             'post' => $post,
             'profile' => $profile,
-            'friendList' => $friendList
+            'friendList' => $friendList,
+            'posts' => $posts,
         ]);
     }
 }
