@@ -112,6 +112,21 @@
         td {
             transition: background-color 0.3s; /* Hiệu ứng chuyển đổi màu khi hover */
         }
+        #editModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            max-width: 90%;
+            background: #1f2937;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none; /* Đảm bảo ban đầu modal bị ẩn */
+            z-index: 99999;
+        }
+
     </style>
 
     <div class="w-full h-full overflow-y-auto">
@@ -179,8 +194,9 @@
                 </div>
 
                 {# Modal edit bài viết #}
-                <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-[99999]">
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 relative z-[99999]">
+                <!-- Modal chỉnh sửa bài viết -->
+                <div id="editModal">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg relative">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-white text-lg font-semibold">Chỉnh sửa bài viết</h2>
                             <button id="closeEditModal" class="text-gray-400 hover:text-white text-xl">✖</button>
@@ -350,7 +366,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Modal chỉnh sửa
             const editModal = document.getElementById("editModal");
             const closeEditModal = document.getElementById("closeEditModal");
             const editForm = document.getElementById("editForm");
@@ -381,25 +396,24 @@
             // Mở modal chỉnh sửa
             function openEditModal(postId, currentContent) {
                 currentPostId = postId;
-                editForm.action = `/post/edit/${postId}`;
 
                 // Đảm bảo TinyMCE đã khởi tạo trước khi set nội dung
                 initTinyMCE(() => {
                     tinymce.get('editContent').setContent(currentContent);
                 });
 
-                // Hiển thị modal
-                editModal.classList.remove("hidden");
+                // Hiển thị modal ở chính giữa màn hình
+                editModal.style.display = "block";
             }
 
             // Đóng modal chỉnh sửa
             closeEditModal.addEventListener("click", function () {
-                editModal.classList.add("hidden");
+                editModal.style.display = "none";
             });
 
-            // Gửi request cập nhật bài viết
+            // Gửi request cập nhật bài viết bằng AJAX
             editForm.addEventListener("submit", function (e) {
-                e.preventDefault(); // Ngăn chặn load lại trang
+                e.preventDefault(); // Ngăn chặn form submit mặc định
 
                 const newContent = tinymce.get('editContent').getContent(); // Lấy nội dung từ TinyMCE
 
@@ -413,7 +427,8 @@
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        location.reload(); // Làm mới trang sau khi chỉnh sửa
+                        editModal.style.display = "none"; // Ẩn modal sau khi chỉnh sửa
+                        window.location.href = "/dashboard/news"; // Quay lại trang tin tức
                     })
                     .catch(error => console.error("Lỗi:", error));
             });
