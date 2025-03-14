@@ -6,7 +6,7 @@
     {% include 'components/sidebar.html.twig' %}
 
     <div class="w-full h-full overflow-y-auto">
-        <div class="bg-gray-900 min-h-screen text-white p-6">
+        <div class="bg-gray-900 min-h-screen text-white p-6 relative">
             <div class="max-w-3xl mx-auto">
                 {# Ô đăng trạng thái #}
                 <div class="bg-gray-800 p-4 rounded-lg shadow-md mb-4">
@@ -18,12 +18,11 @@
                     </div>
                 </div>
 
-                <!-- Modal đăng trạng thái -->
-                <div id="postModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+                <div id="postModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-[99999]">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 relative z-[99999]">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-white text-lg font-semibold">Tạo bài viết</h2>
-                            <button id="closeModal" class="text-gray-400 hover:text-white">✖</button>
+                            <button id="closeModal" class="text-gray-400 hover:text-white text-xl">✖</button>
                         </div>
 
                         <!-- Nội dung nhập TinyMCE -->
@@ -38,30 +37,30 @@
                     </div>
                 </div>
 
-                {# Danh sách tin #}
+                {# Danh sách bạn bè #}
                 <div class="flex space-x-4 overflow-x-auto p-2 justify-center">
-                    {# Story của bạn - Tạo tin #}
+                    {# Hồ sơ của bạn - Hiển thị avatar #}
                     <div class="relative w-28 h-48 bg-gray-800 rounded-xl overflow-hidden flex flex-col justify-end">
-                        <img src="{{ user.avatar }}" class="absolute top-0 w-full h-full object-cover opacity-50">
+                        <img src="{{ profile.avatar }}" class="absolute top-0 w-full h-full object-cover opacity-50">
                         <div class="flex flex-col items-center p-2 relative">
                             <button class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center border-4 border-gray-800">
                                 +
                             </button>
-                            <p class="text-xs mt-1">Tạo tin</p>
+                            <p class="text-xs mt-1">Hồ sơ của bạn</p>
                         </div>
                     </div>
 
-                    {# Story của bạn bè #}
-                    {% for story in stories %}
+                    {# Danh sách bạn bè #}
+                    {% for friend in friendList %}
                         <div class="relative w-28 h-48 bg-gray-800 rounded-xl overflow-hidden">
-                            <img src="{{ story.image }}" class="w-full h-full object-cover">
-                            {# Avatar người đăng #}
+                            <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
+                            {# Avatar bạn bè #}
                             <div class="absolute top-2 left-2 w-10 h-10 border-4 border-gray-900 rounded-full overflow-hidden">
-                                <img src="{{ story.avatar }}" class="w-full h-full object-cover">
+                                <img src="{{ friend.avatar }}" class="w-full h-full object-cover">
                             </div>
-                            {# Tên người dùng #}
+                            {# Tên bạn bè #}
                             <div class="absolute bottom-2 left-2 text-sm font-semibold">
-                                {{ story.name }}
+                                {{ friend.name }}
                             </div>
                         </div>
                     {% endfor %}
@@ -71,7 +70,8 @@
                         →
                     </button>
                 </div>
-                </div>
+
+            </div>
                 {#Danh sách bài viết#}
                 <div class="bg-gray-900 min-h-screen text-white p-6 h-full">
                     <div class="max-w-2xl mx-auto bg-gray-800 p-4 rounded-lg shadow-lg">
@@ -155,6 +155,17 @@
             </div>
         </div>
 
+    <style>
+        #postModal {
+            z-index: 99999 !important; /* Đảm bảo modal luôn nằm trên cùng */
+        }
+
+        .tox-tinymce {
+            z-index: 9999 !important; /* TinyMCE không được cao hơn modal */
+        }
+
+    </style>
+
     <!-- Script TinyMCE và Modal -->
     <script src="https://cdn.tiny.cloud/1/4ap6sni821pn56o84cses0860nmtuvurlwoxovop0j9t37j5/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
@@ -166,7 +177,12 @@
                 plugins: 'autolink lists link image charmap preview',
                 toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent',
                 skin: "oxide-dark",
-                content_css: "dark"
+                content_css: "dark",
+                setup: function (editor) {
+                    editor.on('focus', function () {
+                        document.getElementById("postModal").classList.add("z-[9999]");
+                    });
+                }
             });
 
             // Modal
@@ -180,6 +196,13 @@
 
             closeModal.addEventListener("click", function () {
                 modal.classList.add("hidden");
+            });
+
+            // Đóng modal khi click ra ngoài
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.classList.add("hidden");
+                }
             });
         });
     </script>

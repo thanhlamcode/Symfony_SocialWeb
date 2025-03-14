@@ -188,17 +188,20 @@ class FriendService
 
         // Duyệt qua danh sách bạn bè ban đầu để đảm bảo đủ số lượng
         foreach ($friendIdArray as $friendId) {
-            $profile = $profileMap[$friendId] ?? null; // Kiểm tra nếu profile tồn tại
-            $email = $userEmailMap[$friendId]; // Lấy email từ User
+            if (!isset($friendList[$friendId])) { // Kiểm tra nếu đã tồn tại thì bỏ qua
+                $profile = $profileMap[$friendId] ?? null; // Kiểm tra nếu profile tồn tại
+                $email = $userEmailMap[$friendId] ?? null; // Lấy email từ User
 
-            $friendList[] = [
-                'id' => $friendId,
-                'name' => $profile['name'] ?? $email, // Nếu không có name, dùng email
-                'avatar' => $profile['avatar'] ?? "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg",
-                'slug' => $profile['slug'] ?? null,
-            ];
+                $friendList[$friendId] = [
+                    'id' => $friendId,
+                    'name' => $profile['name'] ?? $email, // Nếu không có name, dùng email
+                    'avatar' => $profile['avatar'] ?? "https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg",
+                    'slug' => $profile['slug'] ?? null,
+                ];
+            }
         }
 
-        return $friendList;
+        // Trả về danh sách sau khi loại bỏ trùng lặp
+        return array_values($friendList);
     }
 }

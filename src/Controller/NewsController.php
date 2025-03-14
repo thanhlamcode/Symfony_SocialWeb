@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\FriendService;
 use App\Service\User\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,13 +12,19 @@ class NewsController extends AbstractController
 {
     private UserServiceInterface $userService;
 
-    public function __construct(UserServiceInterface $userService){
+    private FriendService $friendService;
+
+    public function __construct(UserServiceInterface $userService, FriendService $friendService){
         $this->userService = $userService;
+        $this->friendService = $friendService;
     }
 
     #[Route('/dashboard/news', name: 'news')]
     public function storiesAction(): Response
     {
+
+        $friendList = $this->friendService->getAcceptedFriends();
+
 
         $profile = $this->userService->getCurrentUserProfile();
 
@@ -73,7 +80,8 @@ class NewsController extends AbstractController
             'user' => $user,
             'stories' => $stories,
             'post' => $post,
-            'profile' => $profile
+            'profile' => $profile,
+            'friendList' => $friendList
         ]);
     }
 }
