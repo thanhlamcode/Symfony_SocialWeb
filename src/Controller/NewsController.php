@@ -25,52 +25,6 @@ class NewsController extends AbstractController
 
         $friendList = $this->friendService->getAcceptedFriends();
 
-        // Thêm 5 dữ liệu test vào danh sách bạn bè
-        $friendList = array_merge($friendList, [
-            [
-                "id" => 11,
-                "name" => "Nguyễn Văn A",
-                "avatar" => "https://randomuser.me/api/portraits/men/1.jpg",
-                "slug" => "nguyenvana"
-            ],
-            [
-                "id" => 12,
-                "name" => "Trần Thị B",
-                "avatar" => "https://randomuser.me/api/portraits/women/2.jpg",
-                "slug" => "tranthib"
-            ],
-            [
-                "id" => 13,
-                "name" => "Lê Hồng C",
-                "avatar" => "https://randomuser.me/api/portraits/men/3.jpg",
-                "slug" => "lehongc"
-            ],
-            [
-                "id" => 14,
-                "name" => "Phan Thanh D",
-                "avatar" => "https://randomuser.me/api/portraits/women/4.jpg",
-                "slug" => "phanthanhd"
-            ],
-            [
-                "id" => 15,
-                "name" => "Hoàng Minh E",
-                "avatar" => "https://randomuser.me/api/portraits/men/5.jpg",
-                "slug" => "hoangminhe"
-            ],
-            [
-                "id" => 14,
-                "name" => "Phan Thanh D",
-                "avatar" => "https://randomuser.me/api/portraits/women/4.jpg",
-                "slug" => "phanthanhd"
-            ],
-            [
-                "id" => 15,
-                "name" => "Hoàng Minh E",
-                "avatar" => "https://randomuser.me/api/portraits/men/5.jpg",
-                "slug" => "hoangminhe"
-            ],
-        ]);
-
         $profile = $this->userService->getCurrentUserProfile();
 
         $user = [

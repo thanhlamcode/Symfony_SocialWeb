@@ -11,7 +11,9 @@
                 {# Ô đăng trạng thái #}
                 <div class="bg-gray-800 p-4 rounded-lg shadow-md mb-4">
                     <div class="flex items-center space-x-3">
-                        <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
+                        <a href="/dashboard/profile/{{ profile.slug }}">
+                            <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
+                        </a>
                         <input type="text" placeholder="{{ profile.name }} ơi, bạn đang nghĩ gì thế?"
                                class="flex-1 bg-gray-700 text-white p-2 rounded-full outline-none placeholder-gray-400 cursor-pointer"
                                id="openModal">
