@@ -138,9 +138,9 @@
                         <a href="/dashboard/profile/{{ profile.slug }}">
                             <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
                         </a>
-                        <input type="text" placeholder="{{ profile.name }} ơi, bạn đang nghĩ gì thế?"
+                        <div type="text" placeholder=""
                                class="flex-1 bg-gray-700 text-white p-2 rounded-full outline-none placeholder-gray-400 cursor-pointer"
-                               id="openModal">
+                             id="openModal">{{ profile.name }} ơi, bạn đang nghĩ gì thế? </div>
                     </div>
                 </div>
 
@@ -294,7 +294,7 @@
     <!-- Nhúng Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-    <!-- Swiper Init -->
+    {#Swiper Init#}
     <script>
         var swiper = new Swiper(".mySwiper", {
             slidesPerView: 4,   // Hiển thị 4 ô bạn bè mỗi lần
@@ -509,6 +509,7 @@
         }
     </script>
 
+    {#Toggle Like#}
     <script>
         function toggleLike(postId) {
             fetch(`/post/like/${postId}`, { method: 'POST' })
