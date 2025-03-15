@@ -611,12 +611,16 @@
 
                             data.comments.forEach(comment => {
                                 const commentElement = document.createElement("div");
-                                commentElement.classList.add("flex", "items-center", "space-x-2", "text-gray-300", "mt-2");
+                                commentElement.classList.add("flex", "items-start", "space-x-3", "text-gray-300", "mt-2");
                                 commentElement.innerHTML = `
                             <img src="${comment.authorAvatar}" class="w-8 h-8 rounded-full">
-                            <div>
+                            <div class="flex flex-col">
                                 <p class="font-semibold">${comment.authorName}</p>
                                 <p>${comment.content}</p>
+                                <span class="text-xs text-gray-400">${comment.createdAt}</span> <!-- ✅ Hiển thị thời gian -->
+                                <button onclick="likeComment(${comment.id})" class="text-blue-400 hover:text-blue-500 transition">
+                                    <i class="fas fa-thumbs-up"></i> <span id="like-count-${comment.id}">${comment.likes}</span>
+                                </button>
                             </div>
                         `;
                                 commentsContainer.appendChild(commentElement);
@@ -650,15 +654,19 @@
 
                             let commentsContainer = document.getElementById(`comments-${postId}`);
                             const newComment = document.createElement("div");
-                            newComment.classList.add("flex", "items-center", "space-x-2", "text-gray-300", "mt-2");
+                            newComment.classList.add("flex", "items-start", "space-x-3", "text-gray-300", "mt-2");
                             newComment.innerHTML = `
-                        <img src="${data.authorAvatar}" class="w-8 h-8 rounded-full">
-                        <div>
-                            <p class="font-semibold">${data.authorName}</p>
-                            <p>${data.content}</p>
-                        </div>
-                    `;
-                            commentsContainer.appendChild(newComment); // Thêm bình luận mới vào danh sách
+                    <img src="${data.authorAvatar}" class="w-8 h-8 rounded-full">
+                    <div class="flex flex-col">
+                        <p class="font-semibold">${data.authorName}</p>
+                        <p>${data.content}</p>
+                        <span class="text-xs text-gray-400">${data.createdAt}</span> <!-- ✅ Hiển thị thời gian -->
+                        <button onclick="likeComment(${data.id})" class="text-blue-400 hover:text-blue-500 transition">
+                            <i class="fas fa-thumbs-up"></i> <span id="like-count-${data.id}">0</span>
+                        </button>
+                    </div>
+                `;
+                            commentsContainer.appendChild(newComment); // ✅ Thêm bình luận mới vào danh sách
                         } else {
                             alert("Có lỗi xảy ra khi bình luận!");
                         }
@@ -667,6 +675,20 @@
             }
 
             window.sendComment = sendComment;
+
+            function likeComment(commentId) {
+                fetch(`/post/comment/like/${commentId}`, { method: "POST" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let likeCount = document.getElementById(`like-count-${commentId}`);
+                            likeCount.innerText = data.likes; // ✅ Cập nhật số lượt thích
+                        }
+                    })
+                    .catch(error => console.error("Lỗi khi like bình luận:", error));
+            }
+
+            window.likeComment = likeComment;
         });
     </script>
 
