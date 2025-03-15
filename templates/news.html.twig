@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Tin tức{% endblock %}
+
 {% block body %}
 
 <div class="flex h-screen w-full">
@@ -127,6 +129,41 @@
             z-index: 99999;
         }
 
+        #commentModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            max-width: 90%;
+            background: #18191A;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none; /* Ẩn modal ban đầu */
+            z-index: 99999;
+        }
+
+        #commentList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #commentInput {
+            width: 100%;
+            border: none;
+            background: #3A3B3C;
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        #sendComment {
+            background: #2374E1;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
     </style>
 
     <div class="w-full h-full overflow-y-auto">
@@ -270,9 +307,21 @@
                                    </span>
                                 </button>
 
-                                <button class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition">
+                                <button class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition"
+                                        onclick="toggleComments({{ post.id }})">
                                     <i class="fas fa-comment-alt mr-3"></i> Bình luận
                                 </button>
+                            </div>
+
+                            <!-- Khu vực hiển thị bình luận -->
+                            <div id="comment-section-{{ post.id }}" class="hidden mt-4">
+                                <div id="comments-{{ post.id }}" class="text-gray-300 p-3"></div>
+
+                                <div class="flex items-center bg-gray-800 p-3 rounded-lg mt-3">
+                                    <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
+                                    <input type="text" id="comment-input-{{ post.id }}" class="flex-1 ml-3 bg-gray-700 text-white p-2 rounded-full outline-none" placeholder="Viết bình luận...">
+                                    <button class="ml-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" onclick="sendComment({{ post.id }})">Gửi</button>
+                                </div>
                             </div>
                         </div>
                     {% else %}
@@ -543,6 +592,82 @@
                 })
                 .catch(error => console.error("Lỗi khi like bài viết:", error));
         }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function toggleComments(postId) {
+                let commentSection = document.getElementById(`comment-section-${postId}`);
+
+                if (commentSection.classList.contains("hidden")) {
+                    commentSection.classList.remove("hidden"); // Hiển thị khu vực bình luận
+
+                    // Gọi API để lấy danh sách bình luận
+                    fetch(`/post/comments/${postId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let commentsContainer = document.getElementById(`comments-${postId}`);
+                            commentsContainer.innerHTML = ""; // Xóa bình luận cũ trước khi tải mới
+
+                            data.comments.forEach(comment => {
+                                const commentElement = document.createElement("div");
+                                commentElement.classList.add("flex", "items-center", "space-x-2", "text-gray-300", "mt-2");
+                                commentElement.innerHTML = `
+                            <img src="${comment.authorAvatar}" class="w-8 h-8 rounded-full">
+                            <div>
+                                <p class="font-semibold">${comment.authorName}</p>
+                                <p>${comment.content}</p>
+                            </div>
+                        `;
+                                commentsContainer.appendChild(commentElement);
+                            });
+                        })
+                        .catch(error => console.error("Lỗi khi lấy danh sách bình luận:", error));
+                } else {
+                    commentSection.classList.add("hidden"); // Ẩn khu vực bình luận
+                }
+            }
+
+            window.toggleComments = toggleComments;
+
+            function sendComment(postId) {
+                let commentInput = document.getElementById(`comment-input-${postId}`);
+                let commentContent = commentInput.value.trim();
+
+                if (!commentContent) return;
+
+                fetch(`/post/comment/${postId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ content: commentContent }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            commentInput.value = ""; // Xóa nội dung trong ô nhập bình luận
+
+                            let commentsContainer = document.getElementById(`comments-${postId}`);
+                            const newComment = document.createElement("div");
+                            newComment.classList.add("flex", "items-center", "space-x-2", "text-gray-300", "mt-2");
+                            newComment.innerHTML = `
+                        <img src="${data.authorAvatar}" class="w-8 h-8 rounded-full">
+                        <div>
+                            <p class="font-semibold">${data.authorName}</p>
+                            <p>${data.content}</p>
+                        </div>
+                    `;
+                            commentsContainer.appendChild(newComment); // Thêm bình luận mới vào danh sách
+                        } else {
+                            alert("Có lỗi xảy ra khi bình luận!");
+                        }
+                    })
+                    .catch(error => console.error("Lỗi khi gửi bình luận:", error));
+            }
+
+            window.sendComment = sendComment;
+        });
     </script>
 
     {# Include Alert Component #}
