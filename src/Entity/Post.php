@@ -43,6 +43,7 @@ class Post
     {
         if (!in_array($userId, $this->likedBy)) {
             $this->likedBy[] = $userId;
+            $this->likes = count($this->likedBy); // Cập nhật số lượt thích
         }
         return $this;
     }
@@ -50,8 +51,10 @@ class Post
     public function removeLike(int $userId): self
     {
         $this->likedBy = array_filter($this->likedBy, fn($id) => $id !== $userId);
+        $this->likes = count($this->likedBy); // Cập nhật số lượt thích
         return $this;
     }
+
 
     public function getLikeCount(): int
     {

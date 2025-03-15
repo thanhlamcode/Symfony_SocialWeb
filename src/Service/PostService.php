@@ -52,9 +52,13 @@ class PostService
                 $post->setCreatedAt($adjustedDate);
             }
 
+            // Cập nhật số lượng thích từ số lượng phần tử của liked_by
+            $likedBy = $post->getLikedBy();
+            $post->setLikes(count($likedBy)); // Cập nhật số lượt thích chính xác
+
             // Kiểm tra xem user hiện tại đã like post chưa
             if ($currentUserId !== null) {
-                $post->userLiked = in_array($currentUserId, $post->getLikedBy());
+                $post->userLiked = in_array($currentUserId, $likedBy);
             } else {
                 $post->userLiked = false;
             }
