@@ -33,7 +33,10 @@ class NewsController extends AbstractController
         $profile = $this->userService->getCurrentUserProfile();
 
         // ✅ Lấy danh sách bài viết từ PostService
-        $posts = $this->postService->getRecentPosts();
+        $currentUser = $this->userService->getCurrentUser();
+        $currentUserId = $currentUser ? $currentUser->getId() : null;
+
+        $posts = $this->postService->getRecentPosts(50, $currentUserId);
 
         return $this->render('news.html.twig', [
             'profile' => $profile,

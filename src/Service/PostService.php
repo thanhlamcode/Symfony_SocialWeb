@@ -36,7 +36,7 @@ class PostService
         return $post;
     }
 
-    public function getRecentPosts(int $limit = 50): array
+    public function getRecentPosts(int $limit = 50, ?int $currentUserId = null): array
     {
         $posts = $this->postRepository->findBy([], ['createdAt' => 'DESC'], $limit);
 
@@ -49,12 +49,20 @@ class PostService
             // Cộng thêm 7 tiếng vào createdAt
             if ($post->getCreatedAt() instanceof \DateTime) {
                 $adjustedDate = (clone $post->getCreatedAt())->modify('+7 hours');
-                $post->setCreatedAt($adjustedDate); // Dùng setter thay vì gán trực tiếp
+                $post->setCreatedAt($adjustedDate);
+            }
+
+            // Kiểm tra xem user hiện tại đã like post chưa
+            if ($currentUserId !== null) {
+                $post->userLiked = in_array($currentUserId, $post->getLikedBy());
+            } else {
+                $post->userLiked = false;
             }
         }
 
         return $posts;
     }
+
 
     public function updatePost(int $postId, string $newContent, int $currentUserId): ?Post
     {
