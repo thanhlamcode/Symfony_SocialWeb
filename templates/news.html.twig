@@ -269,6 +269,9 @@
             margin-left: auto; /* Đẩy thời gian về bên phải */
         }
 
+        .commentPage{
+            max-height: 500px;
+        }
 
     </style>
 
@@ -421,7 +424,7 @@
 
                             <!-- Khu vực hiển thị bình luận -->
                             <div id="comment-section-{{ post.id }}" class="hidden mt-4">
-                                <div id="comments-{{ post.id }}" class="text-gray-300 p-3"></div>
+                                <div id="comments-{{ post.id }}" class="commentPage text-gray-300 p-3 max-h-60 overflow-y-auto"></div>
 
                                 <div class="flex items-center bg-gray-800 p-3 rounded-lg mt-3">
                                     <img src="{{ profile.avatar }}" class="w-10 h-10 rounded-full border border-gray-700">
