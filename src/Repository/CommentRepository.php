@@ -17,6 +17,27 @@ class CommentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Lưu hoặc cập nhật comment
+     */
+    public function save(Comment $comment, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($comment);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * Cập nhật nội dung comment
+     */
+    public function updateComment(Comment $comment): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($comment);
+        $em->flush();
+    }
+
+    /**
      * Lấy danh sách comment của một bài viết
      */
     public function findByPostId(int $postId): array
@@ -27,17 +48,6 @@ class CommentRepository extends ServiceEntityRepository
             ->orderBy('c.createdAt', 'ASC')
             ->getQuery()
             ->getResult();
-    }
-
-    /**
-     * Lưu hoặc cập nhật comment
-     */
-    public function save(Comment $comment, bool $flush = true): void
-    {
-        $this->getEntityManager()->persist($comment);
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
     }
 
     /**

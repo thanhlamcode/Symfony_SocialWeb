@@ -4,24 +4,37 @@ namespace App\Service;
 
 use App\Entity\Comment;
 use App\Repository\CommentRepository;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CommentService
 {
     private CommentRepository $commentRepository;
+    private EntityManagerInterface $entityManager;
+    private UserService $userService;
 
-    public function __construct(CommentRepository $commentRepository, EntityManagerInterface $entityManager)
+    public function __construct(CommentRepository $commentRepository, EntityManagerInterface $entityManager, UserService $userService)
     {
         $this->commentRepository = $commentRepository;
+        $this->entityManager = $entityManager;
+        $this->userService = $userService;
     }
 
     /**
-     * Lấy tất cả comment của một bài viết
+     * Lấy tất cả comment của một bài viết theo thứ tự mới nhất.
      */
-    public function getCommentsByPost(int $postId): array
+    public function getRecentComments(int $postId, int $limit = 50): array
     {
-        return $this->commentRepository->findByPostId($postId);
+        $comments = $this->commentRepository->findByPostId($postId);
+
+        foreach ($comments as $comment) {
+            $author = $this->userService->getUserProfileById($comment->getAuthorId());
+            $comment->authorAvatar = $author['avatar'] ?? null;
+            $comment->authorName = $author['name'] ?? 'Ẩn danh';
+        }
+
+        return $comments;
     }
 
     /**
@@ -35,12 +48,14 @@ class CommentService
         $comment->setContent($content);
         $comment->setCreatedAt(new \DateTime());
 
-        $this->commentRepository->save($comment); // Dùng cách lưu mới
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
         return $comment;
     }
 
     /**
-     * Chỉnh sửa comment (chỉ tác giả mới có quyền sửa)
+     * Cập nhật bình luận (chỉ tác giả mới có quyền sửa)
      */
     public function updateComment(int $commentId, string $newContent, int $currentUserId): Comment
     {
@@ -55,12 +70,14 @@ class CommentService
         }
 
         $comment->setContent($newContent);
-        $this->commentRepository->save($comment); // Dùng cách lưu mới
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
         return $comment;
     }
 
     /**
-     * Xóa comment (chỉ tác giả hoặc admin mới có quyền)
+     * Xóa bình luận (chỉ tác giả hoặc admin mới có quyền)
      */
     public function deleteComment(int $commentId, int $currentUserId): void
     {
@@ -74,6 +91,39 @@ class CommentService
             throw new AccessDeniedException('Bạn không có quyền xóa bình luận này.');
         }
 
-        $this->commentRepository->deleteComment($comment); // Dùng cách xóa mới
+        $this->entityManager->remove($comment);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Like/Unlike bình luận
+     */
+    public function likeComment(int $commentId, int $userId): Comment
+    {
+        $comment = $this->commentRepository->find($commentId);
+
+        if (!$comment) {
+            throw new \Exception('Bình luận không tồn tại.');
+        }
+
+        if (!in_array($userId, $comment->getLikedBy())) {
+            $comment->addLike($userId);
+        } else {
+            $comment->removeLike($userId);
+        }
+
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
+        return $comment;
+    }
+
+    /**
+     * Lưu comment vào database
+     */
+    public function save(Comment $comment): void
+    {
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
     }
 }
