@@ -65,10 +65,12 @@ class CommentController extends AbstractController
 
             $comment = $this->commentService->createComment($postId, $user->getId(), $data['content']);
 
+            $profile = $this->userService->getUserProfileById($user->getId());
+
             return $this->json([
                 'success' => true,
                 'id' => $comment->getId(),
-                'authorName' => $user->getName() ?? $user->getEmail(),
+                'authorName' => $profile['name'],
                 'authorAvatar' => $this->userService->getCurrentUserProfile()['avatar'] ?? null,
                 'content' => $comment->getContent(),
                 'createdAt' => $comment->getCreatedAt()->format('Y-m-d H:i:s')
