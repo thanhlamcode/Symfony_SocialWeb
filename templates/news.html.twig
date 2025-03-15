@@ -164,6 +164,112 @@
             color: white;
             font-weight: bold;
         }
+
+        #comments {
+            display: flex;
+            flex-direction: column; /* Bình luận xếp dọc */
+            gap: 8px; /* Khoảng cách giữa các bình luận */
+        }
+
+        .comment-item {
+            display: flex;
+            align-items: flex-start;
+            background-color: #242526; /* Màu nền tối hơn */
+            padding: 12px;
+            border-radius: 12px;
+            max-width: 100%;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .comment-item img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 1px solid #3A3B3C;
+        }
+
+        .comment-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #B0B3B8;
+        }
+
+        .comment-header span {
+            font-weight: bold;
+            color: white;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            margin-top: 5px;
+            color: #E4E6EB;
+        }
+
+        .comment-footer {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #B0B3B8;
+            margin-top: 5px;
+        }
+
+        .comment-footer button {
+            background: none;
+            border: none;
+            color: #B0B3B8;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 15px;
+        }
+
+        .comment-footer button:hover {
+            color: #E4E6EB;
+        }
+
+        .comment-footer i {
+            margin-right: 4px;
+        }
+
+        .comment-footer .likes {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .comment-footer {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #B0B3B8;
+            margin-top: 5px;
+            justify-content: flex-start; /* Canh về bên trái */
+            gap: 10px; /* Khoảng cách giữa các phần tử */
+        }
+
+        .comment-footer .likes {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            gap: 5px; /* Khoảng cách giữa icon và số */
+        }
+
+        .comment-footer .comment-time {
+            color: gray;
+            font-size: 12px;
+            margin-left: auto; /* Đẩy thời gian về bên phải */
+        }
+
+
     </style>
 
     <div class="w-full h-full overflow-y-auto">
@@ -600,9 +706,8 @@
                 let commentSection = document.getElementById(`comment-section-${postId}`);
 
                 if (commentSection.classList.contains("hidden")) {
-                    commentSection.classList.remove("hidden"); // Hiển thị khu vực bình luận
+                    commentSection.classList.remove("hidden");
 
-                    // Gọi API để lấy danh sách bình luận
                     fetch(`/post/comments/${postId}`)
                         .then(response => response.json())
                         .then(data => {
@@ -610,25 +715,43 @@
                             commentsContainer.innerHTML = ""; // Xóa bình luận cũ trước khi tải mới
 
                             data.comments.forEach(comment => {
+                                // Chuyển đổi định dạng ngày (YYYY-MM-DD HH:mm:ss => DD/MM/YYYY)
+                                let date = new Date(comment.createdAt);
+                                let formattedDate = date.toLocaleDateString("vi-VN", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                });
+
                                 const commentElement = document.createElement("div");
-                                commentElement.classList.add("flex", "items-start", "space-x-3", "text-gray-300", "mt-2");
+                                commentElement.classList.add("comment-item");
+
                                 commentElement.innerHTML = `
-                            <img src="${comment.authorAvatar}" class="w-8 h-8 rounded-full">
-                            <div class="flex flex-col">
-                                <p class="font-semibold">${comment.authorName}</p>
-                                <p>${comment.content}</p>
-                                <span class="text-xs text-gray-400">${comment.createdAt}</span> <!-- ✅ Hiển thị thời gian -->
-                                <button onclick="likeComment(${comment.id})" class="text-blue-400 hover:text-blue-500 transition">
-                                    <i class="fas fa-thumbs-up"></i> <span id="like-count-${comment.id}">${comment.likes}</span>
-                                </button>
+                        <img src="${comment.authorAvatar}" class="w-10 h-10 rounded-full border border-gray-700">
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="font-semibold text-white">${comment.authorName}</span>
                             </div>
-                        `;
+                            <p class="comment-text text-gray-300">${comment.content}</p>
+                            <div class="comment-footer flex items-center space-x-4">
+                                <button class="text-blue-400 hover:text-blue-500 transition" onclick="likeComment(${comment.id})">
+                                    <i class="fas fa-thumbs-up"></i> Thích
+                                </button>
+                                <div class="likes flex items-center text-gray-400">
+                                    <i class="fas fa-smile"></i>
+                                    <span id="like-count-${comment.id}" class="ml-1">${comment.likes}</span>
+                                    <span class="ml-4 text-sm font-semibold text-gray-300">${formattedDate}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
                                 commentsContainer.appendChild(commentElement);
                             });
                         })
                         .catch(error => console.error("Lỗi khi lấy danh sách bình luận:", error));
                 } else {
-                    commentSection.classList.add("hidden"); // Ẩn khu vực bình luận
+                    commentSection.classList.add("hidden");
                 }
             }
 
@@ -653,19 +776,39 @@
                             commentInput.value = ""; // Xóa nội dung trong ô nhập bình luận
 
                             let commentsContainer = document.getElementById(`comments-${postId}`);
+
+                            // Chuyển đổi định dạng ngày (YYYY-MM-DD HH:mm:ss => DD/MM/YYYY)
+                            let date = new Date(data.createdAt);
+                            let formattedDate = date.toLocaleDateString("vi-VN", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric"
+                            });
+
+                            // Tạo phần tử bình luận mới
                             const newComment = document.createElement("div");
-                            newComment.classList.add("flex", "items-start", "space-x-3", "text-gray-300", "mt-2");
+                            newComment.classList.add("comment-item");
+
                             newComment.innerHTML = `
-                    <img src="${data.authorAvatar}" class="w-8 h-8 rounded-full">
-                    <div class="flex flex-col">
-                        <p class="font-semibold">${data.authorName}</p>
-                        <p>${data.content}</p>
-                        <span class="text-xs text-gray-400">${data.createdAt}</span> <!-- ✅ Hiển thị thời gian -->
-                        <button onclick="likeComment(${data.id})" class="text-blue-400 hover:text-blue-500 transition">
-                            <i class="fas fa-thumbs-up"></i> <span id="like-count-${data.id}">0</span>
-                        </button>
+                    <img src="${data.authorAvatar}" class="w-10 h-10 rounded-full border border-gray-700">
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <span class="font-semibold text-white">${data.authorName}</span>
+                        </div>
+                        <p class="comment-text text-gray-300">${data.content}</p>
+                        <div class="comment-footer flex items-center space-x-4">
+                            <button class="text-blue-400 hover:text-blue-500 transition" onclick="likeComment(${data.id})">
+                                <i class="fas fa-thumbs-up"></i> Thích
+                            </button>
+                            <div class="likes flex items-center text-gray-400">
+                                <i class="fas fa-smile"></i>
+                                <span id="like-count-${data.id}" class="ml-1">0</span>
+                                <span class="ml-4 text-sm font-semibold text-gray-300">${formattedDate}</span>
+                            </div>
+                        </div>
                     </div>
                 `;
+
                             commentsContainer.appendChild(newComment); // ✅ Thêm bình luận mới vào danh sách
                         } else {
                             alert("Có lỗi xảy ra khi bình luận!");
