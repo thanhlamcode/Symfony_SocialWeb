@@ -115,5 +115,23 @@ class PostController extends AbstractController
         ]);
     }
 
+    #[Route('/post/like/{id}', name: 'like_post', methods: ['POST'])]
+    public function likePost(int $id, Request $request): JsonResponse
+    {
+        $currentUser = $this->userService->getCurrentUser();
+        if (!$currentUser) {
+            return $this->json(['message' => 'Bạn cần đăng nhập'], 401);
+        }
 
+        try {
+            $post = $this->postService->likePost($id, $currentUser->getId());
+            return $this->json([
+                'likeCount' => $post->getLikeCount(),
+                'likedBy' => $post->getLikedBy(),
+                'userLiked' => in_array($currentUser->getId(), $post->getLikedBy())
+            ]);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }

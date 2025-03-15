@@ -25,6 +25,39 @@ class Post
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\Column(type: 'json')]
+    private array $likedBy = [];
+
+    public function getLikedBy(): array
+    {
+        return $this->likedBy;
+    }
+
+    public function setLikedBy(array $likedBy): self
+    {
+        $this->likedBy = $likedBy;
+        return $this;
+    }
+
+    public function addLike(int $userId): self
+    {
+        if (!in_array($userId, $this->likedBy)) {
+            $this->likedBy[] = $userId;
+        }
+        return $this;
+    }
+
+    public function removeLike(int $userId): self
+    {
+        $this->likedBy = array_filter($this->likedBy, fn($id) => $id !== $userId);
+        return $this;
+    }
+
+    public function getLikeCount(): int
+    {
+        return count($this->likedBy);
+    }
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();

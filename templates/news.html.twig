@@ -254,14 +254,17 @@
                             <div class="flex justify-between items-center mt-3 text-gray-400 text-sm">
                                 <div class="flex items-center space-x-2">
                                     <i class="fas fa-thumbs-up"></i>
-                                    <span class="mr-3">{{ post.likes }} lượt thích</span>
+                                    <span id="like-display-{{ post.id }}" class="mr-3">{{ post.likes }} lượt thích</span>
                                 </div>
                             </div>
 
                             {# Nút tương tác #}
                             <div class="flex justify-between mt-2 border-t border-gray-600 pt-2">
-                                <button class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition">
-                                    <i class="fas fa-thumbs-up mr-3"></i> Thích
+                                <button id="like-button-{{ post.id }}"
+                                        class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition"
+                                        onclick="toggleLike({{ post.id }})">
+                                    <i class="fas fa-thumbs-up mr-3"></i>
+                                    <span id="like-label-{{ post.id }}">Thích</span>
                                 </button>
                                 <button class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition">
                                     <i class="fas fa-comment-alt mr-3"></i> Bình luận
@@ -499,6 +502,47 @@
                         });
                 }
             });
+        }
+    </script>
+
+    <script>
+        function toggleLike(postId) {
+            fetch(`/post/like/${postId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        return;
+                    }
+
+                    // Lấy các phần tử HTML cần cập nhật
+                    const likeButton = document.getElementById(`like-button-${postId}`);
+                    const likeLabel = document.getElementById(`like-label-${postId}`);
+                    const likeCount = document.getElementById(`like-count-${postId}`);
+                    const likeDisplay = document.getElementById(`like-display-${postId}`);
+
+                    // Kiểm tra nếu các phần tử tồn tại trước khi cập nhật
+                    if (likeCount) {
+                        likeCount.innerText = data.likeCount;
+                    }
+                    if (likeDisplay) {
+                        likeDisplay.innerText = `${data.likeCount} lượt thích`; // Cập nhật hiển thị lượt thích
+                    }
+                    if (likeButton && likeLabel) {
+                        if (data.userLiked) {
+                            likeButton.classList.add("bg-blue-500"); // Đổi màu xanh khi đã thích
+                            likeButton.classList.remove("hover:bg-gray-700");
+                            likeLabel.innerText = "Đã thích"; // Đổi text thành "Đã thích"
+                        } else {
+                            likeButton.classList.remove("bg-blue-500"); // Trả về màu gốc
+                            likeButton.classList.add("hover:bg-gray-700");
+                            likeLabel.innerText = "Thích"; // Đổi text thành "Thích"
+                        }
+                    } else {
+                        console.error(`Lỗi: Không tìm thấy phần tử like-button-${postId} hoặc like-label-${postId}`);
+                    }
+                })
+                .catch(error => console.error("Lỗi khi like bài viết:", error));
         }
     </script>
 

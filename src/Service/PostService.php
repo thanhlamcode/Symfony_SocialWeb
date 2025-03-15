@@ -96,4 +96,32 @@ class PostService
         return $this->postRepository->find($postId);
     }
 
+    public function likePost(int $postId, int $userId): Post
+    {
+        $post = $this->postRepository->find($postId);
+
+        if (!$post) {
+            throw new \Exception('Bài viết không tồn tại.');
+        }
+
+        if (!in_array($userId, $post->getLikedBy())) {
+            $post->addLike($userId);
+        } else {
+            $post->removeLike($userId);
+        }
+
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+
+        return $post;
+    }
+
+
+    public function save(Post $post): void
+    {
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+    }
+
+
 }
