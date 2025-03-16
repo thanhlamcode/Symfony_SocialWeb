@@ -815,6 +815,11 @@
                 `;
 
                             commentsContainer.appendChild(newComment); // ✅ Thêm bình luận mới vào danh sách
+
+                            // Cuộn xuống bình luận mới nhất
+                            setTimeout(() => {
+                                commentsContainer.scrollTop = commentsContainer.scrollHeight;
+                            }, 100);
                         } else {
                             alert("Có lỗi xảy ra khi bình luận!");
                         }
