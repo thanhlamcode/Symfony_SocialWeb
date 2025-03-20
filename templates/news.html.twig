@@ -282,16 +282,11 @@
 
         /* Nút Xem thêm và Thu gọn */
         .btn-toggle {
-            background-color: #007bff;
             color: white;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
             margin-top: 10px;
-        }
-
-        .btn-toggle:hover {
-            background-color: #0056b3;
         }
 
     </style>
@@ -869,17 +864,24 @@
         });
     </script>
 
+    {#SEE MORE#}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             {% for post in posts %}
             (function() {
-                // Lấy các phần tử cần thiết
                 const toggleBtn = document.getElementById('toggle-btn-{{ post.id }}');
                 const postContent = document.getElementById('post-content-{{ post.id }}');
                 let isExpanded = false;
 
-                // Đảm bảo nếu toggleBtn hoặc postContent không có (khi page chưa load xong) sẽ không xảy ra lỗi
+                // Đảm bảo rằng các phần tử tồn tại trước khi thao tác
                 if (!toggleBtn || !postContent) return;
+
+                // Kiểm tra chiều cao của nội dung và ẩn nút nếu cần thiết
+                if (postContent.scrollHeight <= 500) {
+                    toggleBtn.style.display = 'none';  // Ẩn nút "Xem thêm" nếu chiều cao nhỏ hơn hoặc bằng 500px
+                } else {
+                    toggleBtn.style.display = 'block'; // Hiển thị nút "Xem thêm" nếu chiều cao vượt quá 500px
+                }
 
                 // Xử lý sự kiện khi nhấn nút "Xem thêm" hoặc "Thu gọn"
                 toggleBtn.addEventListener('click', () => {
