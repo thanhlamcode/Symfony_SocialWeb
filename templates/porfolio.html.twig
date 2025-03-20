@@ -11,18 +11,11 @@
         <div class="w-[50%] flex justify-center items-center p-6 overflow-y-auto">
             <div class="w-full max-w-3xl bg-gray-800 rounded-lg shadow-lg p-6">
 
-                {# Header #}
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-white mt-12">{{  profile.name}}</h2>
-                </div>
-
                 {# Banner & Avatar #}
                 <div class="relative mt-6">
                     <!-- Banner -->
                     <div class="relative">
-                        <img src="{{ profileDetail.banner }}" alt="Banner"
-                             class="w-full h-48 object-cover rounded-xl shadow-lg">
-
+                        <img src="{{ profileDetail.banner ? profileDetail.banner : asset('images/snoopy-background.webp') }}" alt="Banner" class="w-full h-48 object-cover rounded-xl shadow-lg" style="object-position: center top;">
                         <!-- Avatar -->
                         <div class="absolute bottom-[-40px] left-6 flex items-center space-x-4">
                             <img src="{{ profileDetail.avatar ?: 'https://st4.depositphotos.com/14903220/22197/v/450/depositphotos_221970610-stock-illustration-abstract-sign-avatar-icon-profile.jpg' }}"
