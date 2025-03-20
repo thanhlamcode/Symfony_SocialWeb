@@ -438,6 +438,7 @@
                                 <button class="flex-1 flex items-center justify-center py-2 rounded-lg hover:bg-gray-700 transition"
                                         onclick="toggleComments({{ post.id }})">
                                     <i class="fas fa-comment-alt mr-3"></i> Bình luận
+                                    <span id="comment-count-{{ post.id }}" class="ml-2 text-sm">({{ post.commentCount }})</span>
                                 </button>
                             </div>
 
@@ -722,6 +723,7 @@
         }
     </script>
 
+    {#SHOW COMMENT#}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             function toggleComments(postId) {

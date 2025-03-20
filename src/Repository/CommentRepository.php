@@ -59,4 +59,16 @@ class CommentRepository extends ServiceEntityRepository
         $em->remove($comment);
         $em->flush();
     }
+
+    // Trong CommentRepository.php
+    public function getCommentCountByPostId(int $postId): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.postId = :postId')
+            ->setParameter('postId', $postId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 }

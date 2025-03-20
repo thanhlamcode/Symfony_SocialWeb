@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Post;
+use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,12 +16,16 @@ class PostService
 
     private UserService $userService;
 
+    private CommentRepository $commentRepository;
+
+
     public function __construct(PostRepository $postRepository, EntityManagerInterface $entityManager,
-    UserService $userService)
+    UserService $userService, CommentRepository $commentRepository)
     {
         $this->postRepository = $postRepository;
         $this->entityManager = $entityManager;
         $this->userService = $userService;
+        $this->commentRepository = $commentRepository;
     }
 
     public function createPost(string $idAuthor, string $content): Post
@@ -55,6 +60,10 @@ class PostService
             // Cập nhật số lượng thích từ số lượng phần tử của liked_by
             $likedBy = $post->getLikedBy();
             $post->setLikes(count($likedBy)); // Cập nhật số lượt thích chính xác
+
+            // Lấy số lượng bình luận
+            $commentCount = $this->commentRepository->getCommentCountByPostId($post->getId()); // Lấy số lượng bình luận từ CommentRepository
+            $post->commentCount = $commentCount; // Thêm thuộc tính số lượng bình luận
 
             // Kiểm tra xem user hiện tại đã like post chưa
             if ($currentUserId !== null) {
